@@ -50,7 +50,7 @@ The foundation includes:
 - XDG-compliant production and development profiles plus temporary test roots;
 - Rust-owned SQLite migrations and repositories;
 - centralized compiled-in module registries and lazy frontend routes;
-- a dashboard placeholder, sidebar navigation, settings, diagnostics, and theme preferences;
+- a lightweight host-aware dashboard, sidebar navigation, settings, diagnostics, and theme preferences;
 - read-only user- and system-scope service and timer inspection, bounded recent logs, and honest health states;
 - launcher CRUD, favorites, URL/folder opening, and structured executable spawning;
 - structured logging, safe diagnostics, automated quality gates, and target-machine verification.

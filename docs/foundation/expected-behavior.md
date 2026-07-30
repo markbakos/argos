@@ -276,6 +276,18 @@ Source: [FND-03 specification](03-shell-and-modules.md)
 - **When** it is registered and parity/navigation tests run,
 - **Then** integration requires changes only to the centralized backend registry, centralized frontend registry, and that module's own files.
 
+### FND-03-AC11 — Host-aware Dashboard
+
+**Mode:** Automated and Target
+
+- **Given** a valid current Linux kernel hostname,
+- **When** the user opens Dashboard,
+- **Then** the hostname is read through the narrow typed core boundary and presented as the page's primary identity without shortcuts, onboarding, fake metrics, feature aggregation, polling, persistence, logging, audit, events, or export;
+- **And** opening Settings or Diagnostics directly does not request hostname.
+- **Given** hostname loading, invalid data, or a platform read failure,
+- **When** Dashboard renders,
+- **Then** the shell remains usable and the page shows a quiet loading or `Hostname unavailable` state without exposing raw errors or guessing an identity.
+
 ## FND-04 — Read-only systemd module
 
 Source: [FND-04 specification](04-systemd-read.md)

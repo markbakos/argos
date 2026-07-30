@@ -39,7 +39,7 @@ Most tests use fakes or captured protocol fixtures and must not require a live s
 
 Vitest and React Testing Library cover:
 
-- shell landmarks, sidebar, dashboard, Settings, Diagnostics, responsive navigation, and route error boundary;
+- shell landmarks, sidebar, host-aware Dashboard hostname loading/success/unavailable and direct-route inactivity, Settings, Diagnostics, responsive navigation, and route error boundary;
 - backend/frontend registry parity, derived navigation, module ordering, disabled disappearance, and unavailable/degraded/error presentation;
 - lazy route loading and failure recovery;
 - system/light/dark theme persistence, live system preference changes, and reduced motion;

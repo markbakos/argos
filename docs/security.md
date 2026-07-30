@@ -33,7 +33,7 @@ Foundation operations are narrow groups:
 
 | Concern | Read operations | Side-effect operations |
 | --- | --- | --- |
-| Core | application info, effective modules, settings, diagnostics | update theme/bootstrap settings; export safe diagnostics |
+| Core | application and local machine identity, effective modules, settings, diagnostics | update theme/bootstrap settings; export safe diagnostics |
 | Modules | effective registry and health | set module enablement/order/bounded settings |
 | Launcher | list/get items | create/update/favorite, delete, launch/open saved item |
 | systemd user | connectivity, services, timers, details, bounded logs | none |
@@ -125,6 +125,8 @@ target type/ID/display name, result, optional error code, bounded metadata
 Database-local mutations and their audit rows share a transaction. Failed validation may be traced but is not required to create persistent audit noise. External actions commit an `attempted` record before execution and append the outcome afterward using one correlation ID; an unavailable attempt audit blocks the side effect. Audit rows are append-only through application repositories: no update/delete use case exists in the foundation. Retention/export policy changes require a later decision.
 
 Metadata is key-allowlisted, serialized to a fixed maximum size, and excludes secrets, tokens, full environments, command argument arrays, arbitrary file contents, full process output, and complete personal records. Human display names are convenience fields; stable target IDs establish identity.
+
+The local hostname may itself be personally identifying. The Dashboard identity read returns it only to the local main window; this flow does not persist, audit, log, emit, or add the hostname to a diagnostic export.
 
 SQLite alone cannot make audit history tamper-proof from the owning OS user. The foundation promises application-level attribution and append-only behavior, not cryptographic non-repudiation.
 

@@ -1,6 +1,6 @@
 # FND-03 — Application shell and module registry
 
-**Status:** Approved for foundation implementation  
+**Status:** Approved through FND-03-AC10; proposed FND-03-AC11 awaits approval
 **Depends on:** FND-01; preference persistence depends on FND-02  
 **Enables:** systemd/launcher presentation and diagnostics integration
 
@@ -8,11 +8,11 @@
 
 A control center needs one predictable, accessible shell without turning navigation, module state, or styling into scattered special cases. Modules also need an explicit compiled extension point so growth does not couple unrelated features.
 
-The user gains persistent navigation, honest module health, theme choice, consistent interaction states, and settings that can disable/reorder modules without losing code-owned metadata.
+The user gains persistent navigation, a recognizable machine-aware landing page, honest module health, theme choice, consistent interaction states, and settings that can disable/reorder modules without losing code-owned metadata.
 
 ## Workflows
 
-1. The user opens Argos to a lightweight dashboard placeholder and navigates enabled modules from a persistent sidebar.
+1. The user opens Argos to a lightweight Dashboard that identifies the current machine by its Linux hostname and navigates enabled modules from a persistent sidebar.
 2. The user disables or reorders a module in Settings; navigation updates and the override persists across restart.
 3. An enabled module whose dependency/platform is unavailable remains reachable, shows a labeled health badge, and explains recovery.
 4. The user selects system, light, or dark theme; system follows OS changes and the selection persists.
@@ -24,7 +24,9 @@ The user gains persistent navigation, honest module health, theme choice, consis
 ### Shell and presentation
 
 - Implement one React root with providers for router, TanStack Query, theme, error boundary, and typed event invalidation.
-- Provide a persistent sidebar, main landmark/outlet, page headers, Dashboard placeholder, Settings, Diagnostics entry, and a non-functional reserved global-search trigger.
+- Provide a persistent sidebar, main landmark/outlet, page headers, lightweight host-aware Dashboard, Settings, Diagnostics entry, and a non-functional reserved global-search trigger.
+- Present the current Linux kernel hostname as the Dashboard's primary identity through one narrow typed core read. Keep the page intentionally sparse: no onboarding, quick links, user greeting/profile, fake metrics, feature aggregation, or engagement prompts.
+- Design the Dashboard as one spacious non-interactive machine identity composition: a `Dashboard` page label, the hostname as the sole level-one heading, and the subdued line `Your local control center.` Decorative treatment must remain secondary and hidden from assistive technology. While loading or unavailable, preserve the same layout with `This machine` as the heading and a concise text status.
 - Support system/light/dark themes from semantic tokens defined in [Architecture](../architecture.md#design-tokens-and-themes), with system default and live OS preference changes.
 - Provide shared accessible patterns for tiles, lists, tables, forms, dialogs, detail panels, exact-target confirmations, empty/loading/error/unavailable/degraded states, and health indicators.
 - Restore focus after dialogs, support keyboard navigation and reduced motion, and never encode status by color alone.
@@ -53,7 +55,7 @@ The user gains persistent navigation, honest module health, theme choice, consis
 
 - No component outside the API transport calls Tauri.
 - Navigation has a single derived source and adding a module does not require edits in multiple shell files.
-- Initial shell render does not wait for systemd or launcher data; module health may settle asynchronously.
+- Initial shell render does not wait for systemd or launcher data; the Dashboard hostname settles independently and module health may settle asynchronously.
 - Query retries are bounded and appropriate to `retryable`; error strings are never parsed.
 - Token contrast and keyboard behavior meet accessibility verification on both themes.
 
@@ -66,30 +68,31 @@ The user gains persistent navigation, honest module health, theme choice, consis
 - A lazy bundle failure shows a route error with retry navigation; the shell stays usable.
 - A disabled route reached by bookmark redirects to Settings or renders a stable disabled explanation without loading feature data.
 - Invalid/corrupt theme uses `system`, reports a safe configuration diagnostic, and preserves correction ability.
+- A hostname read or validation failure leaves the shell and Dashboard usable, displays a quiet `Hostname unavailable` fallback, and exposes no raw platform error or guessed identity.
 
 ## Explicit exclusions
 
-No runtime/downloader plugin system, module marketplace/generator, customizable dashboard, drag-and-drop layout, global search implementation, Redux store, tray, embedded remote app, or module-specific business behavior is included.
+No runtime/downloader plugin system, module marketplace/generator, customizable dashboard, drag-and-drop layout, Dashboard shortcuts/onboarding/metrics, global search implementation, Redux store, tray, embedded remote app, or module-specific business behavior is included.
 
 ## Architecture impact
 
-This workstream establishes the two centralized compiled registries, effective manifest merge, query/event providers, shell route boundaries, and design-system primitives. It implements ADR-002, ADR-007, and the UI consequences of ADR-013.
+This workstream establishes the two centralized compiled registries, effective manifest merge, query/event providers, shell route boundaries, and design-system primitives. The Dashboard identity read adds a bounded hostname value, a narrow application port/use case, a Linux adapter, and a read-only core Tauri/API method without moving platform access into React or Tauri. It implements ADR-002, ADR-003, ADR-004, ADR-007, and the UI consequences of ADR-013.
 
 ## Contracts
 
-Contracts include `ModuleManifestView`, `EffectiveModule`, `ModuleEnablement`, `ModuleHealth`, tagged `HealthReason`, capability/platform/dependency views, `ListModulesResponse`, and typed preference update requests/results. Frontend route loaders are handwritten and keyed by generated `ModuleId`; they are not serialized service registrations.
+Contracts include `SystemIdentity { hostname }`, `ModuleManifestView`, `EffectiveModule`, `ModuleEnablement`, `ModuleHealth`, tagged `HealthReason`, capability/platform/dependency views, `ListModulesResponse`, and typed preference update requests/results. The hostname is a validated UTF-8 string of 1–64 bytes with no control characters. Frontend route loaders are handwritten and keyed by generated `ModuleId`; they are not serialized service registrations.
 
 ## Persistence and migrations
 
-Uses the initial `module_preferences` table; no new migration beyond FND-02. Theme remains `config.toml`. Enable/order mutation and its audit event share a transaction. Null override restores the manifest default rather than copying the default into user data.
+Uses the initial `module_preferences` table; no new migration beyond FND-02. Hostname is read from the current kernel and is never persisted by Argos. Theme remains `config.toml`. Enable/order mutation and its audit event share a transaction. Null override restores the manifest default rather than copying the default into user data.
 
 ## Security implications
 
-Module enablement does not grant undeclared Tauri capability or backend authority. Manifests declare capabilities for diagnostics/review; Tauri capabilities remain code-owned. Settings input is bounded and revalidated in Rust. React health/disable state is not an authorization check.
+Module enablement does not grant undeclared Tauri capability or backend authority. Manifests declare capabilities for diagnostics/review; Tauri capabilities remain code-owned. The hostname is read with normal user authority through the platform adapter's fixed `gethostname(2)` operation and exposed only through a fixed `core-read` command. No shell, environment-variable, network, arbitrary file, or frontend-supplied source is accepted. Because hostnames can identify a person or device, this flow does not log, audit, persist, emit, or export the value. Settings input is bounded and revalidated in Rust. React health/disable state is not an authorization check.
 
 ## Performance implications
 
-Only shell/core queries run initially. Lazy module bundles and queries begin at navigation. Event listeners are reference-counted. Module health checks are cached, event-driven or explicit; no global one-second poll exists.
+Only shell/core queries run initially. The Dashboard reads hostname at most once per process through an indefinitely fresh Query entry; it has no event, interval, or background refresh and does not run when the initial route is not Dashboard. Lazy module bundles and queries begin at navigation. Event listeners are reference-counted. Module health checks are cached, event-driven or explicit; no global one-second poll exists.
 
 ## Acceptance criteria
 
@@ -103,19 +106,21 @@ Only shell/core queries run initially. Lazy module bundles and queries begin at 
 - **FND-03-AC08:** Core sidebar, forms, dialogs, confirmation, and error recovery are keyboard operable with visible focus and correct focus restoration.
 - **FND-03-AC09:** Inactive lazy modules perform no data fetch, interval, or lingering feature subscription.
 - **FND-03-AC10:** Adding a test module requires only the backend and frontend registry extension points, plus its own feature files.
+- **FND-03-AC11 (proposed):** Dashboard presents the validated current Linux kernel hostname through the typed core boundary, uses quiet loading/unavailable states without raw error disclosure, renders no shortcut/onboarding/metric content, performs no feature fetch or polling, and does not request hostname when another core route is opened directly.
 
 ## Testing strategy
 
-Use Rust registry/preference use-case tests, SQLite preference integration tests, frontend route/query/provider tests, lazy import instrumentation, theme media-query mocks, accessibility interaction tests, lint boundary checks, and manual light/dark keyboard/contrast passes.
+Use Rust hostname value/source/application tests, contract and Tauri translation tests, mocked frontend hostname loading/success/failure/inactive-route tests, Rust registry/preference use-case tests, SQLite preference integration tests, frontend route/query/provider tests, lazy import instrumentation, theme media-query mocks, accessibility interaction tests, lint boundary checks, and manual light/dark keyboard/contrast passes.
 
 ## Implementation order and tasks
 
 1. `FND-SHL-001` — React providers, router, shell, and core routes.
-2. `FND-SHL-002` — semantic tokens, themes, accessible shared states/primitives.
-3. `FND-SHL-003` — backend manifest/effective registry and validation.
-4. `FND-SHL-004` — frontend registry, lazy routes, derived navigation, parity.
-5. `FND-SHL-005` — persisted module settings/ordering and audit.
-6. `FND-SHL-006` — shell/module accessibility and inactive-resource verification.
+2. `FND-SHL-001A` — host-aware Dashboard identity read and presentation.
+3. `FND-SHL-002` — semantic tokens, themes, accessible shared states/primitives.
+4. `FND-SHL-003` — backend manifest/effective registry and validation.
+5. `FND-SHL-004` — frontend registry, lazy routes, derived navigation, parity.
+6. `FND-SHL-005` — persisted module settings/ordering and audit.
+7. `FND-SHL-006` — shell/module accessibility and inactive-resource verification.
 
 ## Verification and documentation update
 

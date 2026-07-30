@@ -140,7 +140,7 @@ Modules may use shared application services and contracts. They must not invoke 
 - `systemd`: enabled by default, read-only, with separately reported user/system health.
 - `launcher`: enabled by default, persistent CRUD and narrow launch/open behavior.
 
-Dashboard is a shell placeholder rather than a data-hungry module. Diagnostics and Settings are core routes.
+Dashboard is a lightweight host-aware core route rather than a data-hungry module. It may read the current Linux kernel hostname through one narrow cached core query; it does not aggregate feature data, poll, or become a customizable dashboard. Diagnostics and Settings are core routes.
 
 ## Frontend architecture
 

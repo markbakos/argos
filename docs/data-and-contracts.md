@@ -217,7 +217,7 @@ Contracts cover:
 
 - branded/string resource identifiers (`LauncherItemId`, module and actor IDs);
 - `PageRequest`, opaque cursor, bounded limits, and `Page<T>` where lists need pagination;
-- application/build/profile information and resolved path diagnostics (diagnostics only);
+- application/build/profile information, the bounded local `SystemIdentity` hostname view, and resolved path diagnostics (diagnostics only);
 - module manifests/effective states, requirements, capabilities, and health reasons;
 - launcher requests, item views, kinds, validation results, and launch outcomes;
 - explicit `SystemdScope`, unit kind/state summaries, timer trigger data, details, journal entries, filters, and health;
