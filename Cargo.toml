@@ -26,9 +26,11 @@ argos-storage-sqlite = { path = "crates/argos-storage-sqlite" }
 argos-systemd = { path = "crates/argos-systemd" }
 rusqlite = { version = "0.40.1", features = ["bundled", "chrono", "serde_json", "uuid"] }
 serde = { version = "1", features = ["derive"] }
+serde_json = "1"
 tauri = "2.11.5"
 tauri-build = "2.6.3"
 ts-rs = { version = "12.0.1", features = ["chrono-impl", "serde-compat", "uuid-impl"] }
+uuid = { version = "1", features = ["v4"] }
 zbus = { version = "5.18.0", default-features = false, features = ["tokio"] }
 
 [workspace.lints.rust]
@@ -42,4 +44,3 @@ unwrap_used = "deny"
 codegen-units = 1
 lto = "thin"
 strip = true
-

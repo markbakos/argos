@@ -101,4 +101,4 @@ Reviewed on 2026-07-30 before implementation:
 
 ## Current implementation task
 
-`FND-BST-001` and `FND-BST-002` are complete. The next dependency-ready task is **FND-BST-003: implement the typed error, correlation, action, and actor foundation**.
+`FND-BST-001` through `FND-BST-005` and `FND-SHL-001` are complete. The next dependency-ready tasks include `FND-BST-006`, `FND-DAT-001`, and `FND-SHL-003`; no subsequent task is selected.

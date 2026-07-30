@@ -7,7 +7,7 @@ license.workspace = true
 
 [dependencies]
 argos-contracts.workspace = true
+ts-rs.workspace = true
 
 [lints]
 workspace = true
-

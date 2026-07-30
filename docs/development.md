@@ -31,6 +31,41 @@ Validated on Arch Linux on 2026-07-30:
 
 The clean-checkout bootstrap proof used `pnpm install --frozen-lockfile`, the desktop frontend build, and `cargo check --workspace --locked --offline`. The empty domain crate has no dependency, and Tauri appears only under `argos-desktop` in the Cargo graph. Generator, database, and D-Bus behavior remain owned by their later tasks.
 
+### Typed error foundation
+
+`argos-domain` owns stable error codes/namespaces, bounded allowlisted public details, UUID v4 correlation IDs, action classifications, and trusted actor contexts. The desktop human actor is assigned behind the adapter boundary as `human:local-user`; React never supplies it.
+
+`argos-application` attaches retry policy and correlation to domain failures. Its public error view derives the message from the stable code and excludes the retained internal cause, so SQL, paths, command output, and Rust debug strings cannot cross an adapter boundary through the error translator. Focused domain/application tests cover every initial code namespace, detail bounds, actor/correlation invariants, and unknown-cause redaction.
+
+### Frontend API and Tauri transport
+
+`apps/desktop/src/api/transport/tauri.ts` is the only frontend file allowed to import Tauri APIs. It unwraps Tauri event payloads but exposes only the project-owned `Transport` and teardown types. `apps/desktop/src/api/` owns semantic methods, runtime decoding of generated response/event contracts, and conversion of rejected values to a safe `ApiError` that implements the generated `AppError` fields.
+
+To add a command or event after its owning task is approved:
+
+1. define the Rust-owned request/response/event contract and regenerate TypeScript;
+2. implement the use case in `argos-application` against domain ports;
+3. translate through one narrow Tauri handler that assigns its trusted actor and uses managed service state;
+4. add one semantic method/subscription and runtime decoder under `src/api/`, without exporting a command-name API;
+5. test application behavior, Tauri translation/IPC serialization, frontend transport mocks, error normalization, and teardown;
+6. run contract drift and boundary checks.
+
+The bootstrap proof command is side-effect-free, accepts no WebView input, assigns `human:local-user` in Rust, and emits a typed correlated proof event. It exists only to verify this extension path before feature commands are introduced.
+
+### Frontend shell layout
+
+The implemented core shell is contained under `apps/desktop/src/app/`:
+
+- `App.tsx` creates the long-lived router and query client, while `providers.tsx` composes their React providers;
+- `query.ts` defines a 30-second stale time, five-minute cache lifetime, disabled focus refetch, no mutation retry, and at most two retries only for typed `ApiError` values marked `retryable`;
+- `coreRoutes.tsx` is the single source for the non-disableable Dashboard, Settings, and Diagnostics route presentation used by both the router and sidebar;
+- `router.tsx` owns the route tree, and keeps `RouteErrorPage.tsx` inside the `AppShell.tsx` outlet so a page failure cannot replace navigation;
+- `pages.tsx` contains the lightweight core pages. They issue no backend request, subscribe to no event, and create no query during initial render or core navigation.
+
+TanStack Query supplies an `AbortSignal` to query functions; route consumers must pass or observe it so unmounting cancels obsolete work. The shell test suite proves bounded retry behavior, cancellation on unmount, loading and failure containment, core navigation, and zero initial queries with the available backend API mocked unavailable.
+
+`styles/index.css` currently provides only the semantic surface, text, border, accent, focus, and warning tokens required to render the shell with system light/dark preference and reduced-motion-safe transitions. `FND-SHL-002` owns the complete persisted theme behavior and shared accessible primitive/state vocabulary.
+
 ## Command surface
 
 The implemented root pnpm scripts delegate to workspace tools so contributors do not memorize crate paths:
@@ -46,10 +81,11 @@ The implemented root pnpm scripts delegate to workspace tools so contributors do
 | `pnpm test`                                      | Run Rust and frontend automated tests with isolated roots                                              |
 | `pnpm test:rust`                                 | Workspace Rust unit/integration/doc tests                                                              |
 | `pnpm test:web`                                  | Vitest and React Testing Library                                                                       |
+| `pnpm contracts:generate` / `pnpm contracts:check` | Atomically regenerate/check committed Rust-owned TypeScript contracts                                |
 | `pnpm boundaries:check` / `pnpm boundaries:test` | Enforce and test Rust dependency and frontend Tauri-import boundaries                                  |
-| `pnpm check`                                     | Run formatting, lint, typecheck, Rust/frontend/boundary tests, boundary scan, and frontend/Rust builds |
+| `pnpm check`                                     | Run formatting, lint, typecheck, tests, contract drift, boundaries, and frontend/Rust builds           |
 
-`pnpm package` and `pnpm contracts:generate` remain reserved contracts until `FND-BST-006` and `FND-BST-004` implement them. Migration, contract-drift, and repository-live-data gates join `pnpm check` in their owning tasks. Commands fail with actionable prerequisite errors and do not access production data at runtime.
+`pnpm package` remains reserved until `FND-BST-006` implements it. Migration and repository-live-data gates join `pnpm check` in their owning tasks. Commands fail with actionable prerequisite errors and do not access production data at runtime.
 
 ## Quality gates
 
@@ -137,7 +173,9 @@ No other navigation edit should be needed. Cross-module access is introduced as 
 
 ## Generated contracts
 
-Rust definitions in `argos-contracts` are authoritative. `pnpm contracts:generate` invokes an `xtask`, writes deterministic committed files beneath the frontend `generated` directory, and never modifies handwritten API wrappers or components. Generation runs locally after a Rust contract change and in CI to detect drift.
+Rust definitions in `argos-contracts` are authoritative. `pnpm contracts:generate` invokes `xtask`, generates and Prettier-formats a sibling temporary tree, then atomically replaces `apps/desktop/src/generated/`; a generation or formatting failure preserves the last committed tree. `pnpm contracts:check` generates the same temporary tree and reports exact stale files without modifying committed output. The full `pnpm check` gate includes this drift check.
+
+The selected generator is `ts-rs` 12. Its Rust tests prove the actual lowercase/tagged enum names, optional fields, generic pages/events, string ID aliases, map representation, every stable error code and detail shape, and representative JSON round trips. `xtask` tests generate twice byte-identically and deliberately stale a generated file to prove rejection.
 
 A contract change includes:
 

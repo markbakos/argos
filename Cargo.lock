@@ -60,6 +60,7 @@ version = "0.1.0"
 dependencies = [
  "argos-domain",
  "serde",
+ "serde_json",
  "ts-rs",
 ]
 
@@ -80,6 +81,9 @@ dependencies = [
 [[package]]
 name = "argos-domain"
 version = "0.1.0"
+dependencies = [
+ "uuid",
+]
 
 [[package]]
 name = "argos-platform-linux"
@@ -4677,6 +4681,7 @@ name = "xtask"
 version = "0.1.0"
 dependencies = [
  "argos-contracts",
+ "ts-rs",
 ]
 
 [[package]]

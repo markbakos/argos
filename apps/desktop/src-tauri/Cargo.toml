@@ -22,6 +22,8 @@ argos-storage-sqlite.workspace = true
 argos-systemd.workspace = true
 tauri.workspace = true
 
+[dev-dependencies]
+tauri = { workspace = true, features = ["test"] }
+
 [lints]
 workspace = true
-

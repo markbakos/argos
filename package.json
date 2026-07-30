@@ -14,11 +14,13 @@
     "format:check": "pnpm --filter @argos/desktop format:check && cargo fmt --all --check",
     "lint": "pnpm --filter @argos/desktop lint && cargo clippy --workspace --all-targets --all-features --locked -- -D warnings",
     "typecheck": "pnpm --filter @argos/desktop typecheck",
+    "contracts:generate": "cargo run -p xtask --locked -- contracts generate",
+    "contracts:check": "cargo run -p xtask --locked -- contracts check",
     "test": "pnpm test:rust && pnpm test:web && pnpm boundaries:test",
     "test:rust": "cargo test --workspace --all-targets --locked",
     "test:web": "pnpm --filter @argos/desktop test",
     "boundaries:check": "node tools/check-boundaries.mjs",
     "boundaries:test": "node --test tools/check-boundaries.test.mjs",
-    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm boundaries:check && pnpm build"
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm contracts:check && pnpm boundaries:check && pnpm build"
   }
 }
