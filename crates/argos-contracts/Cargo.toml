@@ -1,0 +1,15 @@
+[package]
+name = "argos-contracts"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+argos-domain.workspace = true
+serde.workspace = true
+ts-rs.workspace = true
+
+[lints]
+workspace = true
+

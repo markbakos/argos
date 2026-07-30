@@ -1,0 +1,5 @@
+packages:
+  - apps/*
+minimumReleaseAgeExclude:
+  - vite@8.2.0
+  - lucide-react@1.28.0

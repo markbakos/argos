@@ -1,0 +1,45 @@
+[workspace]
+resolver = "3"
+members = [
+  "apps/desktop/src-tauri",
+  "crates/argos-application",
+  "crates/argos-contracts",
+  "crates/argos-domain",
+  "crates/argos-platform-linux",
+  "crates/argos-storage-sqlite",
+  "crates/argos-systemd",
+  "tools/xtask",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.97.1"
+license = "MIT"
+
+[workspace.dependencies]
+argos-application = { path = "crates/argos-application" }
+argos-contracts = { path = "crates/argos-contracts" }
+argos-domain = { path = "crates/argos-domain" }
+argos-platform-linux = { path = "crates/argos-platform-linux" }
+argos-storage-sqlite = { path = "crates/argos-storage-sqlite" }
+argos-systemd = { path = "crates/argos-systemd" }
+rusqlite = { version = "0.40.1", features = ["bundled", "chrono", "serde_json", "uuid"] }
+serde = { version = "1", features = ["derive"] }
+tauri = "2.11.5"
+tauri-build = "2.6.3"
+ts-rs = { version = "12.0.1", features = ["chrono-impl", "serde-compat", "uuid-impl"] }
+zbus = { version = "5.18.0", default-features = false, features = ["tokio"] }
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+expect_used = "deny"
+unwrap_used = "deny"
+
+[profile.release]
+codegen-units = 1
+lto = "thin"
+strip = true
+

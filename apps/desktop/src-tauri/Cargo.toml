@@ -1,0 +1,27 @@
+[package]
+name = "argos-desktop"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+build = "build.rs"
+
+[lib]
+name = "argos_desktop"
+crate-type = ["lib", "cdylib", "staticlib"]
+
+[build-dependencies]
+tauri-build.workspace = true
+
+[dependencies]
+argos-application.workspace = true
+argos-contracts.workspace = true
+argos-domain.workspace = true
+argos-platform-linux.workspace = true
+argos-storage-sqlite.workspace = true
+argos-systemd.workspace = true
+tauri.workspace = true
+
+[lints]
+workspace = true
+

@@ -1,0 +1,47 @@
+{
+  "name": "@argos/desktop",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "pnpm typecheck && vite build",
+    "format": "prettier --write . --ignore-unknown",
+    "format:check": "prettier --check . --ignore-unknown",
+    "lint": "eslint . --max-warnings 0",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "tauri": "tauri"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5",
+    "@tauri-apps/api": "^2.11.0",
+    "lucide-react": "^1.28.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-router-dom": "^7"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.0",
+    "@tauri-apps/cli": "^2.11.4",
+    "@testing-library/react": "^16",
+    "@testing-library/user-event": "^14",
+    "@eslint/js": "^10",
+    "@types/node": "^24",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^6",
+    "eslint": "^10",
+    "eslint-plugin-react-hooks": "^7",
+    "eslint-plugin-react-refresh": "^0.5",
+    "globals": "^17",
+    "jsdom": "^30.0.1",
+    "prettier": "^3",
+    "tailwindcss": "^4.3.0",
+    "typescript": "^6.0.0",
+    "typescript-eslint": "^8",
+    "vitest": "^4",
+    "vite": "^8.2.0"
+  }
+}

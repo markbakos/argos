@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "core-window",
+  "description": "Baseline capability for the local Argos main window.",
+  "windows": ["main"],
+  "permissions": ["core:default"]
+}
