@@ -12,7 +12,7 @@ use argos_contracts::{
     ActionClassification, ActorId, ActorKind, ActorRef, AppError, AppErrorCode, AppErrorDetails,
     Availability, BoundaryProof, BuildInfo, CoreEvent, CorrelationId, Cursor, EventEnvelope,
     HealthReason, HealthState, ModuleEnablement, ModuleId, Page, PageRequest, RuntimeProfile,
-    SettingsCategory,
+    SettingsCategory, SystemIdentity,
 };
 use ts_rs::{Config, TS};
 
@@ -152,6 +152,7 @@ fn generate_tree(output: &Path) -> XtaskResult<()> {
     PageRequest::export(&config)?;
     RuntimeProfile::export(&config)?;
     SettingsCategory::export(&config)?;
+    SystemIdentity::export(&config)?;
 
     fs::write(output.join("index.ts"), generated_index())?;
     Ok(())
@@ -181,6 +182,7 @@ fn generated_index() -> String {
         "PageRequest",
         "RuntimeProfile",
         "SettingsCategory",
+        "SystemIdentity",
     ];
     let exports = names
         .into_iter()

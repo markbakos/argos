@@ -1,6 +1,6 @@
 # FND-03 — Application shell and module registry
 
-**Status:** Approved through FND-03-AC10; proposed FND-03-AC11 awaits approval
+**Status:** Approved for foundation implementation through FND-03-AC11
 **Depends on:** FND-01; preference persistence depends on FND-02  
 **Enables:** systemd/launcher presentation and diagnostics integration
 
@@ -88,7 +88,7 @@ Uses the initial `module_preferences` table; no new migration beyond FND-02. Hos
 
 ## Security implications
 
-Module enablement does not grant undeclared Tauri capability or backend authority. Manifests declare capabilities for diagnostics/review; Tauri capabilities remain code-owned. The hostname is read with normal user authority through the platform adapter's fixed `gethostname(2)` operation and exposed only through a fixed `core-read` command. No shell, environment-variable, network, arbitrary file, or frontend-supplied source is accepted. Because hostnames can identify a person or device, this flow does not log, audit, persist, emit, or export the value. Settings input is bounded and revalidated in Rust. React health/disable state is not an authorization check.
+Module enablement does not grant undeclared Tauri capability or backend authority. Manifests declare capabilities for diagnostics/review; Tauri capabilities remain code-owned. The hostname is read with normal user authority through the platform adapter's safe fixed `rustix::system::uname().nodename()` operation, which returns the Linux kernel hostname value, and exposed only through a fixed `core-read` command. No shell, environment-variable, network, arbitrary file, or frontend-supplied source is accepted. Because hostnames can identify a person or device, this flow does not log, audit, persist, emit, or export the value. Settings input is bounded and revalidated in Rust. React health/disable state is not an authorization check.
 
 ## Performance implications
 
@@ -106,7 +106,7 @@ Only shell/core queries run initially. The Dashboard reads hostname at most once
 - **FND-03-AC08:** Core sidebar, forms, dialogs, confirmation, and error recovery are keyboard operable with visible focus and correct focus restoration.
 - **FND-03-AC09:** Inactive lazy modules perform no data fetch, interval, or lingering feature subscription.
 - **FND-03-AC10:** Adding a test module requires only the backend and frontend registry extension points, plus its own feature files.
-- **FND-03-AC11 (proposed):** Dashboard presents the validated current Linux kernel hostname through the typed core boundary, uses quiet loading/unavailable states without raw error disclosure, renders no shortcut/onboarding/metric content, performs no feature fetch or polling, and does not request hostname when another core route is opened directly.
+- **FND-03-AC11:** Dashboard presents the validated current Linux kernel hostname through the typed core boundary, uses quiet loading/unavailable states without raw error disclosure, renders no shortcut/onboarding/metric content, performs no feature fetch or polling, and does not request hostname when another core route is opened directly.
 
 ## Testing strategy
 

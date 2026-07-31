@@ -10,7 +10,7 @@ Start with the [documentation index](docs/README.md), then read the [product def
 
 - Product, architecture, safety boundaries, and foundation specifications: approved
 - Expected behavior and implementation tasks: approved
-- Foundation implementation: `FND-BST-001` through `FND-BST-005` and `FND-SHL-001` complete
+- Foundation implementation: `FND-BST-001` through `FND-BST-005`, `FND-SHL-001`, and `FND-SHL-001A` complete
 
 The implementation order and completion gates are documented in [Foundation planning](docs/foundation/README.md) and the [task ledger](docs/foundation/tasks.md).
 
@@ -51,7 +51,7 @@ Start the Tauri development application:
 WEBKIT_DISABLE_DMABUF_RENDERER=1 pnpm dev
 ```
 
-This launches the Vite frontend and opens the Argos desktop window. Source builds embed the `development` runtime profile; they do not select the production profile. The current foundation shell opens on Dashboard with persistent navigation to Settings and Diagnostics; feature modules arrive in later tasks. Close the main window to exit Argos.
+This launches the Vite frontend and opens the Argos desktop window. Source builds embed the `development` runtime profile; they do not select the production profile. The current foundation shell opens on a sparse Dashboard named for the local machine, with persistent navigation to Settings and Diagnostics; feature modules arrive in later tasks. Close the main window to exit Argos.
 
 To verify the workspace without launching the desktop window:
 

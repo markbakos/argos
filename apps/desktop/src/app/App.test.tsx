@@ -34,7 +34,10 @@ function renderRoutes(routes: RouteObject[], initialPath = "/") {
 }
 
 describe("application shell", () => {
-  it("opens the Dashboard with the required shell landmarks", () => {
+  it("opens a sparse host-aware Dashboard with the required shell landmarks", async () => {
+    const identity = vi
+      .spyOn(api.core, "getSystemIdentity")
+      .mockResolvedValue({ hostname: "argos-workstation" });
     renderRoutes(appRoutes);
 
     const navigation = screen.getByRole("navigation", {
@@ -43,8 +46,19 @@ describe("application shell", () => {
 
     expect(screen.getByRole("main")).toBeTruthy();
     expect(
-      screen.getByRole("heading", { level: 1, name: "Dashboard" }),
+      await screen.findByRole("heading", {
+        level: 1,
+        name: "argos-workstation",
+      }),
     ).toBeTruthy();
+    expect(
+      within(screen.getByRole("main")).getByText("Dashboard"),
+    ).toBeTruthy();
+    expect(screen.getByText("Your local control center.")).toBeTruthy();
+    expect(
+      within(screen.getByRole("main")).queryAllByRole("link"),
+    ).toHaveLength(0);
+    expect(identity).toHaveBeenCalledTimes(1);
     expect(
       within(navigation)
         .getByRole("link", { name: "Dashboard" })
@@ -64,7 +78,17 @@ describe("application shell", () => {
   });
 
   it("navigates among every non-disableable core route", async () => {
+    const identity = vi
+      .spyOn(api.core, "getSystemIdentity")
+      .mockResolvedValue({ hostname: "argos-workstation" });
     const { user } = renderRoutes(appRoutes);
+
+    expect(
+      await screen.findByRole("heading", {
+        level: 1,
+        name: "argos-workstation",
+      }),
+    ).toBeTruthy();
 
     await user.click(screen.getByRole("link", { name: "Settings" }));
     expect(
@@ -78,22 +102,62 @@ describe("application shell", () => {
 
     await user.click(screen.getByRole("link", { name: "Dashboard" }));
     expect(
-      screen.getByRole("heading", { level: 1, name: "Dashboard" }),
+      screen.getByRole("heading", { level: 1, name: "argos-workstation" }),
     ).toBeTruthy();
+    expect(identity).toHaveBeenCalledTimes(1);
   });
 
-  it("stays usable with the backend unavailable and starts no data query", async () => {
+  it("stays usable when hostname is unavailable without exposing the failure", async () => {
     const boundaryProof = vi
       .spyOn(api.core, "proveBoundary")
       .mockRejectedValue(new Error("backend unavailable"));
+    const identity = vi
+      .spyOn(api.core, "getSystemIdentity")
+      .mockRejectedValue(new Error("private hostname source failure"));
     const { queryClient, user } = renderRoutes(appRoutes);
+
+    expect(await screen.findByText("Hostname unavailable")).toBeTruthy();
+    expect(
+      screen.getByRole("heading", { level: 1, name: "This machine" }),
+    ).toBeTruthy();
+    expect(screen.queryByText("private hostname source failure")).toBeNull();
 
     await user.click(screen.getByRole("link", { name: "Settings" }));
     await user.click(screen.getByRole("link", { name: "Diagnostics" }));
+    await user.click(screen.getByRole("link", { name: "Dashboard" }));
 
     expect(screen.getByRole("main")).toBeTruthy();
     expect(screen.getByRole("navigation")).toBeTruthy();
+    expect(screen.getByText("Hostname unavailable")).toBeTruthy();
     expect(boundaryProof).not.toHaveBeenCalled();
+    expect(identity).toHaveBeenCalledTimes(1);
+    expect(queryClient.getQueryCache().getAll()).toHaveLength(1);
+  });
+
+  it("preserves the Dashboard composition while hostname is loading", () => {
+    vi.spyOn(api.core, "getSystemIdentity").mockReturnValue(
+      new Promise<never>(() => undefined),
+    );
+
+    renderRoutes(appRoutes);
+
+    expect(
+      screen.getByRole("heading", { level: 1, name: "This machine" }),
+    ).toBeTruthy();
+    expect(screen.getByRole("status").textContent).toBe("Reading hostname…");
+    expect(screen.getByText("Your local control center.")).toBeTruthy();
+  });
+
+  it("does not request hostname when another core route opens directly", async () => {
+    const identity = vi.spyOn(api.core, "getSystemIdentity");
+    const { queryClient, user } = renderRoutes(appRoutes, "/settings");
+
+    expect(
+      screen.getByRole("heading", { level: 1, name: "Settings" }),
+    ).toBeTruthy();
+    await user.click(screen.getByRole("link", { name: "Diagnostics" }));
+
+    expect(identity).not.toHaveBeenCalled();
     expect(queryClient.getQueryCache().getAll()).toHaveLength(0);
   });
 

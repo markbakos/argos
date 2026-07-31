@@ -6,6 +6,6 @@ mod error;
 pub use base::{
     ActionClassification, ActorId, ActorKind, ActorRef, Availability, BoundaryProof, BuildInfo,
     CoreEvent, CorrelationId, Cursor, EventEnvelope, HealthReason, HealthState, ModuleEnablement,
-    ModuleId, Page, PageRequest, RuntimeProfile, SettingsCategory,
+    ModuleId, Page, PageRequest, RuntimeProfile, SettingsCategory, SystemIdentity,
 };
 pub use error::{AppError, AppErrorCode, AppErrorDetails};

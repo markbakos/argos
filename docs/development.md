@@ -27,7 +27,7 @@ Validated on Arch Linux on 2026-07-30:
 - Node.js 24.15 or newer and pnpm 11.18.0, pinned by the root `packageManager` field; Node.js 24 LTS is the CI target and local bootstrap was checked with Node.js 26.5.0;
 - Arch packages `webkit2gtk-4.1`, `base-devel`, `corepack`, `curl`, `wget`, `file`, `openssl`, `nodejs`, `npm`, and `sqlite`;
 - Tauri 2.11, React 19, Vite 8, Tailwind CSS 4 through its first-party Vite plugin, and Lucide 1;
-- `rusqlite` with bundled SQLite for deterministic application storage, `zbus` with the Tokio backend for systemd D-Bus, `ts-rs` for Rust-owned TypeScript generation, and Lucide for the lightweight icon set.
+- `rusqlite` with bundled SQLite for deterministic application storage, `zbus` with the Tokio backend for systemd D-Bus, `ts-rs` for Rust-owned TypeScript generation, `rustix` with only its `system` API for a safe kernel hostname read under the workspace's `unsafe_code = "forbid"` policy, and Lucide for the lightweight icon set.
 
 The clean-checkout bootstrap proof used `pnpm install --frozen-lockfile`, the desktop frontend build, and `cargo check --workspace --locked --offline`. The empty domain crate has no dependency, and Tauri appears only under `argos-desktop` in the Cargo graph. Generator, database, and D-Bus behavior remain owned by their later tasks.
 
@@ -60,9 +60,17 @@ The implemented core shell is contained under `apps/desktop/src/app/`:
 - `query.ts` defines a 30-second stale time, five-minute cache lifetime, disabled focus refetch, no mutation retry, and at most two retries only for typed `ApiError` values marked `retryable`;
 - `coreRoutes.tsx` is the single source for the non-disableable Dashboard, Settings, and Diagnostics route presentation used by both the router and sidebar;
 - `router.tsx` owns the route tree, and keeps `RouteErrorPage.tsx` inside the `AppShell.tsx` outlet so a page failure cannot replace navigation;
-- `pages.tsx` contains the lightweight core pages. They issue no backend request, subscribe to no event, and create no query during initial render or core navigation.
+- `pages.tsx` contains the lightweight core pages. Dashboard alone uses the route-local system-identity query; Settings and Diagnostics issue no backend request, subscribe to no event, and create no query when opened directly.
 
-TanStack Query supplies an `AbortSignal` to query functions; route consumers must pass or observe it so unmounting cancels obsolete work. The shell test suite proves bounded retry behavior, cancellation on unmount, loading and failure containment, core navigation, and zero initial queries with the available backend API mocked unavailable.
+TanStack Query supplies an `AbortSignal` to query functions; route consumers must pass or observe it so unmounting cancels obsolete work. The shell test suite proves bounded retry behavior, cancellation on unmount, loading and failure containment, core navigation, one initial identity query on Dashboard, and zero queries when another core route opens directly.
+
+### Local system identity
+
+The host-aware Dashboard reads only the current Linux kernel hostname. `argos-domain` owns the 1–64-byte visible UTF-8 `Hostname` value and `SystemIdentityReader` port; `argos-application` owns the correlated read-only use case; and `argos-platform-linux` implements the port with the safe `rustix::system::uname().nodename()` API. The adapter does not consult a shell, environment variable, network source, arbitrary file, or current directory.
+
+The Tauri composition root injects that adapter and exposes `core_get_system_identity` as a parameterless narrow read translated to the generated `SystemIdentity` contract. `api.core.getSystemIdentity()` performs matching runtime validation. `app/systemIdentity.ts` owns an indefinitely fresh, non-retrying Query entry with no polling, reconnect refresh, event, or remount refresh. Dashboard is the only consumer.
+
+The page uses a single non-interactive identity composition: `Dashboard` label, hostname H1, and `Your local control center.` It contains no shortcuts, onboarding, user profile/greeting, metrics, or feature aggregation. Loading and failure preserve the layout as `This machine`; failure displays only `Hostname unavailable`. The hostname is not persisted, logged, audited, emitted, or exported by this flow.
 
 `styles/index.css` currently provides only the semantic surface, text, border, accent, focus, and warning tokens required to render the shell with system light/dark preference and reduced-motion-safe transitions. `FND-SHL-002` owns the complete persisted theme behavior and shared accessible primitive/state vocabulary.
 

@@ -76,6 +76,13 @@ pub struct BuildInfo {
     pub profile: RuntimeProfile,
 }
 
+/// Bounded local machine identity safe for the local application shell.
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize, TS)]
+#[ts(export_to = "SystemIdentity.ts")]
+pub struct SystemIdentity {
+    pub hostname: String,
+}
+
 /// Side-effect-free bootstrap response used to prove the typed desktop boundary.
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize, TS)]
 #[ts(export_to = "BoundaryProof.ts")]
@@ -333,6 +340,13 @@ mod tests {
             payload: CoreEvent::SettingsChanged {
                 category: SettingsCategory::Theme,
             },
+        })
+    }
+
+    #[test]
+    fn system_identity_round_trips_the_hostname_only() -> Result<(), serde_json::Error> {
+        assert_round_trip(&SystemIdentity {
+            hostname: "argos-workstation".to_owned(),
         })
     }
 

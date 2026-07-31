@@ -8,7 +8,7 @@ type InternalCause = Box<dyn Error + Send + Sync + 'static>;
 #[derive(Debug)]
 pub struct ApplicationError {
     code: ErrorCode,
-    details: Option<ErrorDetails>,
+    details: Option<Box<ErrorDetails>>,
     retryable: bool,
     correlation_id: CorrelationId,
     internal_cause: Option<InternalCause>,
@@ -21,7 +21,7 @@ impl ApplicationError {
         let code = error.code();
         Self {
             code,
-            details: error.into_details(),
+            details: error.into_details().map(Box::new),
             retryable,
             correlation_id,
             internal_cause: None,
@@ -48,7 +48,7 @@ impl ApplicationError {
         PublicError {
             code: self.code,
             message: self.code.safe_message(),
-            details: self.details.clone(),
+            details: self.details.as_deref().cloned(),
             retryable: self.retryable,
             correlation_id: self.correlation_id,
         }

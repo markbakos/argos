@@ -25,6 +25,7 @@ argos-platform-linux = { path = "crates/argos-platform-linux" }
 argos-storage-sqlite = { path = "crates/argos-storage-sqlite" }
 argos-systemd = { path = "crates/argos-systemd" }
 rusqlite = { version = "0.40.1", features = ["bundled", "chrono", "serde_json", "uuid"] }
+rustix = { version = "1.1.4", features = ["system"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tauri = "2.11.5"

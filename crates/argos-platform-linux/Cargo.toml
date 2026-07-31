@@ -8,7 +8,7 @@ license.workspace = true
 [dependencies]
 argos-application.workspace = true
 argos-domain.workspace = true
+rustix.workspace = true
 
 [lints]
 workspace = true
-

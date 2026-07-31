@@ -2,7 +2,11 @@ import { useEffect, useState } from "react";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import type { BoundaryProof, EventEnvelope } from "../generated";
+import type {
+  BoundaryProof,
+  EventEnvelope,
+  SystemIdentity,
+} from "../generated";
 import { createApi } from ".";
 import type { Transport } from "./transport/tauri";
 
@@ -32,6 +36,44 @@ function ProofConsumer({ transport }: { transport: Transport }) {
 }
 
 describe("core API", () => {
+  it("reads and validates the machine hostname through one semantic method", async () => {
+    const commands: string[] = [];
+    const identity: SystemIdentity = { hostname: "argos-workstation" };
+    const transport: Transport = {
+      invoke<T>(command: string, decode: (value: unknown) => T) {
+        commands.push(command);
+        return Promise.resolve(identity).then(decode);
+      },
+      listen() {
+        return Promise.resolve(() => undefined);
+      },
+    };
+
+    await expect(
+      createApi(transport).core.getSystemIdentity(),
+    ).resolves.toEqual(identity);
+    expect(commands).toEqual(["core_get_system_identity"]);
+  });
+
+  it("rejects malformed hostnames without exposing their values", async () => {
+    const transport: Transport = {
+      invoke<T>(_command: string, decode: (value: unknown) => T) {
+        return Promise.resolve({ hostname: "private\nhost" }).then(decode);
+      },
+      listen() {
+        return Promise.resolve(() => undefined);
+      },
+    };
+
+    const result = createApi(transport).core.getSystemIdentity();
+
+    await expect(result).rejects.toMatchObject({
+      code: "CORE_INTERNAL",
+      message: "Argos could not complete the request.",
+    });
+    await expect(result).rejects.not.toHaveProperty("hostname");
+  });
+
   it("lets a component reach the typed command only through the facade", async () => {
     const commands: string[] = [];
     const transport: Transport = {

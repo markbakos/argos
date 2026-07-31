@@ -21,3 +21,4 @@ export type { Page } from "./Page";
 export type { PageRequest } from "./PageRequest";
 export type { RuntimeProfile } from "./RuntimeProfile";
 export type { SettingsCategory } from "./SettingsCategory";
+export type { SystemIdentity } from "./SystemIdentity";
