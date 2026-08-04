@@ -20,6 +20,7 @@ Normative words such as **must**, **must not**, **should**, and **may** are inte
 8. [Foundation specifications](foundation/README.md) — workstreams, dependency order, phase gate, and detailed specifications.
 9. [Foundation expected behavior](foundation/expected-behavior.md) — test-first Given/When/Then scenarios for every foundation acceptance criterion.
 10. [Foundation task ledger](foundation/tasks.md) — stable, dependency-ordered implementation tasks.
+11. [Feature specifications](features/README.md) — proposed and approved behavior beyond foundation, expected-behavior tests, and task ledgers.
 
 ## Document map
 
@@ -35,10 +36,11 @@ Normative words such as **must**, **must not**, **should**, and **may** are inte
 | Foundation feature requirements | [Foundation specifications](foundation/README.md) |
 | Testable foundation behavior | [Foundation expected behavior](foundation/expected-behavior.md) |
 | Executable implementation sequence | [Task ledger](foundation/tasks.md) |
+| Proposed and approved feature behavior | [Feature specifications](features/README.md) |
 
 ## Authority and change control
 
-The accepted [decision register](decisions.md) has highest authority. Architecture, security, and data documents refine those decisions. Foundation specifications define milestone behavior, and the task ledger schedules it. A lower-level document must not contradict a higher-level one.
+The accepted [decision register](decisions.md) has highest authority. Architecture, security, and data documents refine those decisions. Foundation specifications define milestone behavior, and the foundation task ledger schedules it. An approved feature specification defines only its feature behavior; a proposed specification has no implementation authority. A lower-level document must not contradict a higher-level one.
 
 For every implementation unit, follow this lifecycle:
 
@@ -60,4 +62,4 @@ Silent divergence is a defect. Each material documentation change should name th
 
 ## Documentation design
 
-The set deliberately uses one decision register instead of one file per decision, and one task ledger instead of duplicating tasks in several plans. Separate foundation specification files are justified because they have different trust boundaries, failure modes, and acceptance evidence. No file is an empty placeholder.
+The set deliberately uses one decision register instead of one file per decision, one foundation ledger, and one feature ledger instead of duplicating tasks across plans. Separate specifications are justified when behavior has different trust boundaries, failure modes, and acceptance evidence. No file is an empty placeholder.
