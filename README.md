@@ -10,7 +10,7 @@ Start with the [documentation index](docs/README.md), then read the [product def
 
 - Product, architecture, safety boundaries, and foundation specifications: approved
 - Expected behavior and implementation tasks: approved
-- Foundation implementation: `FND-BST-001` through `FND-BST-005`, `FND-SHL-001`, and `FND-SHL-001A` complete
+- Foundation implementation: bootstrap lifecycle, runtime paths/configuration, core shell/themes, and module registries complete through the Task Manager dependency chain
 
 The implementation order and completion gates are documented in [Foundation planning](docs/foundation/README.md) and the [task ledger](docs/foundation/tasks.md).
 
@@ -51,7 +51,7 @@ Start the Tauri development application:
 WEBKIT_DISABLE_DMABUF_RENDERER=1 pnpm dev
 ```
 
-This launches the Vite frontend and opens the Argos desktop window. Source builds embed the `development` runtime profile; they do not select the production profile. The current foundation shell opens on a sparse Dashboard named for the local machine, with persistent navigation to Settings and Diagnostics; feature modules arrive in later tasks. Close the main window to exit Argos.
+This launches the Vite frontend and opens the Argos desktop window. Source builds embed the `development` runtime profile; they do not select the production profile. The shell opens on a sparse Dashboard named for the local machine, with Task Manager as the first lazy feature section plus Settings and Diagnostics. Task Manager reads current CPU, memory, process, disk, network, load, and supported pressure data only while its page is visible. Close the main window to exit Argos.
 
 To verify the workspace without launching the desktop window:
 
@@ -65,8 +65,9 @@ Other useful commands:
 | ------------------ | ------------------------------------------------------------------ |
 | `pnpm build`       | Build the frontend and Rust workspace without packaging            |
 | `pnpm tauri:build` | Build an optimized, non-bundled development-profile desktop binary |
+| `pnpm package`     | Build the explicit non-bundled production-profile desktop binary  |
 | `pnpm test`        | Run Rust, frontend, and boundary tests                             |
 | `pnpm lint`        | Run ESLint and Clippy with warnings denied                         |
 | `pnpm format`      | Format TypeScript, CSS, Markdown, and Rust sources                 |
 
-Packaging and production-profile builds are not implemented yet. The complete command contract is in the [development guide](docs/development.md#command-surface).
+The complete command contract is in the [development guide](docs/development.md#command-surface).

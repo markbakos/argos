@@ -12,6 +12,7 @@ pub enum ErrorNamespace {
     Module,
     Systemd,
     Process,
+    TaskManager,
     Launcher,
     Permission,
     Validation,
@@ -46,6 +47,9 @@ pub enum ErrorCode {
     ProcessNotExecutable,
     ProcessOpenFailed,
     ProcessSpawnFailed,
+    TaskManagerUnavailable,
+    TaskManagerSnapshotFailed,
+    TaskManagerProcessGone,
     LauncherNotFound,
     LauncherConflict,
     LauncherKindUnsupported,
@@ -56,7 +60,7 @@ pub enum ErrorCode {
 }
 
 impl ErrorCode {
-    pub const ALL: [Self; 33] = [
+    pub const ALL: [Self; 36] = [
         Self::CoreInternal,
         Self::CoreCancelled,
         Self::ConfigHomeUnavailable,
@@ -83,6 +87,9 @@ impl ErrorCode {
         Self::ProcessNotExecutable,
         Self::ProcessOpenFailed,
         Self::ProcessSpawnFailed,
+        Self::TaskManagerUnavailable,
+        Self::TaskManagerSnapshotFailed,
+        Self::TaskManagerProcessGone,
         Self::LauncherNotFound,
         Self::LauncherConflict,
         Self::LauncherKindUnsupported,
@@ -122,6 +129,9 @@ impl ErrorCode {
             Self::ProcessNotExecutable => "PROCESS_NOT_EXECUTABLE",
             Self::ProcessOpenFailed => "PROCESS_OPEN_FAILED",
             Self::ProcessSpawnFailed => "PROCESS_SPAWN_FAILED",
+            Self::TaskManagerUnavailable => "TASK_MANAGER_UNAVAILABLE",
+            Self::TaskManagerSnapshotFailed => "TASK_MANAGER_SNAPSHOT_FAILED",
+            Self::TaskManagerProcessGone => "TASK_MANAGER_PROCESS_GONE",
             Self::LauncherNotFound => "LAUNCHER_NOT_FOUND",
             Self::LauncherConflict => "LAUNCHER_CONFLICT",
             Self::LauncherKindUnsupported => "LAUNCHER_KIND_UNSUPPORTED",
@@ -160,6 +170,9 @@ impl ErrorCode {
             | Self::ProcessNotExecutable
             | Self::ProcessOpenFailed
             | Self::ProcessSpawnFailed => ErrorNamespace::Process,
+            Self::TaskManagerUnavailable
+            | Self::TaskManagerSnapshotFailed
+            | Self::TaskManagerProcessGone => ErrorNamespace::TaskManager,
             Self::LauncherNotFound | Self::LauncherConflict | Self::LauncherKindUnsupported => {
                 ErrorNamespace::Launcher
             }
@@ -202,6 +215,9 @@ impl ErrorCode {
             Self::ProcessNotExecutable => "The requested target is not executable.",
             Self::ProcessOpenFailed => "The requested target could not be opened.",
             Self::ProcessSpawnFailed => "The requested executable could not be started.",
+            Self::TaskManagerUnavailable => "Task Manager data is unavailable.",
+            Self::TaskManagerSnapshotFailed => "Task Manager could not read this snapshot.",
+            Self::TaskManagerProcessGone => "The selected process is no longer available.",
             Self::LauncherNotFound => "The launcher item was not found.",
             Self::LauncherConflict => "The launcher item changed before this request completed.",
             Self::LauncherKindUnsupported => "The launcher item kind is unsupported.",
@@ -378,6 +394,7 @@ mod tests {
                 ErrorNamespace::Module => "MODULE_",
                 ErrorNamespace::Systemd => "SYSTEMD_",
                 ErrorNamespace::Process => "PROCESS_",
+                ErrorNamespace::TaskManager => "TASK_MANAGER_",
                 ErrorNamespace::Launcher => "LAUNCHER_",
                 ErrorNamespace::Permission => "PERMISSION_",
                 ErrorNamespace::Validation => "VALIDATION_",

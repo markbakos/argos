@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "core-write",
+  "description": "Narrow Argos core preference updates for the local main window.",
+  "windows": ["main"],
+  "permissions": ["allow-core-set-theme"]
+}

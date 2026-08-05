@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-core-list-modules"
+description = "Enables the core_list_modules command without any pre-configured scope."
+commands.allow = ["core_list_modules"]
+
+[[permission]]
+identifier = "deny-core-list-modules"
+description = "Denies the core_list_modules command without any pre-configured scope."
+commands.deny = ["core_list_modules"]

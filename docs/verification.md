@@ -120,6 +120,12 @@ Minimum foundation evidence:
 
 Targets are engineering goals, not permission to hide measurements. If cold start exceeds two seconds or idle behavior is not effectively zero, file an evidence-backed issue/spec update before declaring foundation complete.
 
+### Task Manager implementation checkpoint — 2026-08-05
+
+The `TMG-001` through `TMG-004` implementation checkpoint passed deterministic parser/rate/search/sort/bound tests, Tauri/API contract translation, frontend fake-timer visibility/non-overlap/teardown tests, registry parity, read-only capability/privacy scans, contract drift, and optimized development plus explicit production-profile builds. The optimized frontend emitted Task Manager as a separate 28.46 kB lazy chunk (7.67 kB gzip), and a development-profile GNOME launch using an isolated `/tmp` root exited cleanly with no remaining Argos/Vite process.
+
+The ignored target-only Linux reader check sampled the host's bounded snapshot 50 times with 305 observed processes: average wall time 11 ms and p95 11 ms, below the 250 ms criterion. This checkpoint contains aggregate values only. It does not replace `TMG-005`: the full ten-minute inactive/active process-group CPU/write observation, 30-minute alternating-view memory/cache observation, and interactive real-data/accessibility matrix remain required before final TM-01 sign-off.
+
 ## Logging and diagnostics verification
 
 Tests force rotation thresholds with small configured test limits and verify file count/size bounds. A fixed-capacity recent-error buffer evicts oldest entries. Structured events contain component/operation/result/duration/error code without secrets.

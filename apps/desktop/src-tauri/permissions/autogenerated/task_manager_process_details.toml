@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-task-manager-process-details"
+description = "Enables the task_manager_process_details command without any pre-configured scope."
+commands.allow = ["task_manager_process_details"]
+
+[[permission]]
+identifier = "deny-task-manager-process-details"
+description = "Denies the task_manager_process_details command without any pre-configured scope."
+commands.deny = ["task_manager_process_details"]

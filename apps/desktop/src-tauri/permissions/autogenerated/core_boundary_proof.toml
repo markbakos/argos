@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-core-boundary-proof"
+description = "Enables the core_boundary_proof command without any pre-configured scope."
+commands.allow = ["core_boundary_proof"]
+
+[[permission]]
+identifier = "deny-core-boundary-proof"
+description = "Denies the core_boundary_proof command without any pre-configured scope."
+commands.deny = ["core_boundary_proof"]

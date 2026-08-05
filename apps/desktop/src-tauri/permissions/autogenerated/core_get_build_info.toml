@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-core-get-build-info"
+description = "Enables the core_get_build_info command without any pre-configured scope."
+commands.allow = ["core_get_build_info"]
+
+[[permission]]
+identifier = "deny-core-get-build-info"
+description = "Denies the core_get_build_info command without any pre-configured scope."
+commands.deny = ["core_get_build_info"]

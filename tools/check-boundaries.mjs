@@ -42,6 +42,47 @@ export function invalidCargoDependencies(packages) {
   );
 }
 
+function stringArray(source, name) {
+  const escapedName = name.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const body = source.match(new RegExp(`${escapedName}[^=]*=\\s*\\[([\\s\\S]*?)\\]`))?.[1] ?? "";
+  return [...body.matchAll(/["']([^"']+)["']/g)].map((match) => match[1]);
+}
+
+export function moduleRegistryMismatch(backendSource, frontendSource) {
+  const backend = stringArray(backendSource, "COMPILED_MODULE_IDS").sort();
+  const frontend = stringArray(frontendSource, "FRONTEND_MODULE_IDS").sort();
+  return JSON.stringify(backend) === JSON.stringify(frontend)
+    ? []
+    : [`module registry mismatch: backend=${backend.join(",")} frontend=${frontend.join(",")}`];
+}
+
+export function invalidTaskManagerCapability(source) {
+  const capability = JSON.parse(source);
+  const permissions = [...(capability.permissions ?? [])].sort();
+  const expected = [
+    "allow-task-manager-process-details",
+    "allow-task-manager-snapshot",
+  ];
+  return capability.identifier === "task-manager-read" &&
+    JSON.stringify(permissions) === JSON.stringify(expected)
+    ? []
+    : ["Task Manager capability must contain only its two narrow reads"];
+}
+
+export function taskManagerPrivacyViolations(files) {
+  const forbiddenSink = /localStorage|sessionStorage|console\.|tracing::|log::|rusqlite|config\.toml|audit/i;
+  return files.flatMap(({ path, source }) =>
+    forbiddenSink.test(source) ? [path] : [],
+  );
+}
+
+export function broadCapabilityViolations(files) {
+  const broadAuthority = /["'](?:shell|fs|process|autostart):|systemd[^"']*write/i;
+  return files.flatMap(({ path, source }) =>
+    broadAuthority.test(source) ? [path] : [],
+  );
+}
+
 function main() {
   const frontendViolations = forbiddenFrontendImports(
     sourceFiles(frontendRoot).map((path) => ({
@@ -56,7 +97,46 @@ function main() {
     }),
   );
   const cargoViolations = invalidCargoDependencies(metadata.packages);
-  const violations = [...frontendViolations, ...cargoViolations];
+  const registryViolations = moduleRegistryMismatch(
+    readFileSync(join(repositoryRoot, "crates/argos-application/src/modules.rs"), "utf8"),
+    readFileSync(join(frontendRoot, "modules/registry.tsx"), "utf8"),
+  );
+  const capabilityViolations = invalidTaskManagerCapability(
+    readFileSync(
+      join(repositoryRoot, "apps/desktop/src-tauri/capabilities/task-manager-read.json"),
+      "utf8",
+    ),
+  );
+  const broadCapabilityViolationsFound = broadCapabilityViolations(
+    readdirSync(join(repositoryRoot, "apps/desktop/src-tauri/capabilities"))
+      .filter((name) => name.endsWith(".json"))
+      .map((name) => ({
+        path: `apps/desktop/src-tauri/capabilities/${name}`,
+        source: readFileSync(
+          join(repositoryRoot, "apps/desktop/src-tauri/capabilities", name),
+          "utf8",
+        ),
+      })),
+  );
+  const taskManagerFiles = [
+    "crates/argos-domain/src/task_manager.rs",
+    "crates/argos-application/src/task_manager.rs",
+    "crates/argos-contracts/src/task_manager.rs",
+    "crates/argos-platform-linux/src/task_manager.rs",
+    "apps/desktop/src/api/taskManager.ts",
+    ...sourceFiles(join(frontendRoot, "modules/task-manager")).map((path) =>
+      relative(repositoryRoot, path),
+    ),
+  ].map((path) => ({ path, source: readFileSync(join(repositoryRoot, path), "utf8") }));
+  const privacyViolations = taskManagerPrivacyViolations(taskManagerFiles);
+  const violations = [
+    ...frontendViolations,
+    ...cargoViolations,
+    ...registryViolations,
+    ...capabilityViolations,
+    ...broadCapabilityViolationsFound,
+    ...privacyViolations,
+  ];
 
   if (violations.length) {
     console.error(`Boundary violations:\n${violations.map((value) => `- ${value}`).join("\n")}`);
@@ -67,4 +147,3 @@ function main() {
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   main();
 }
-

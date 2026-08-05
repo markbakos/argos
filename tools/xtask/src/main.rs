@@ -10,9 +10,16 @@ use std::{
 
 use argos_contracts::{
     ActionClassification, ActorId, ActorKind, ActorRef, AppError, AppErrorCode, AppErrorDetails,
-    Availability, BoundaryProof, BuildInfo, CoreEvent, CorrelationId, Cursor, EventEnvelope,
-    HealthReason, HealthState, ModuleEnablement, ModuleId, Page, PageRequest, RuntimeProfile,
-    SettingsCategory, SystemIdentity,
+    Availability, BootstrapSettings, BoundaryProof, BuildInfo, CoreEvent, CorrelationId, Cursor,
+    EffectiveModule, EventEnvelope, HealthReason, HealthState, ListModulesResponse,
+    ModuleCapability, ModuleEnablement, ModuleId, ModuleManifestView, Page, PageRequest,
+    RuntimeProfile, SetThemeRequest, SettingsCategory, SystemIdentity, TaskManagerBlockDeviceUsage,
+    TaskManagerCpuCoreUsage, TaskManagerCpuUsage, TaskManagerLoadUsage, TaskManagerMemoryUsage,
+    TaskManagerNetworkInterfaceUsage, TaskManagerPartialReason, TaskManagerPressureUsage,
+    TaskManagerPressureWindow, TaskManagerProcessDetailField, TaskManagerProcessDetails,
+    TaskManagerProcessIdentity, TaskManagerProcessIo, TaskManagerProcessMemoryDetails,
+    TaskManagerProcessState, TaskManagerProcessSummary, TaskManagerSnapshot,
+    TaskManagerSnapshotRequest, TaskManagerSort, TaskManagerSortDirection, ThemePreference,
 };
 use ts_rs::{Config, TS};
 
@@ -138,21 +145,48 @@ fn generate_tree(output: &Path) -> XtaskResult<()> {
     AppErrorCode::export(&config)?;
     AppErrorDetails::export(&config)?;
     Availability::export(&config)?;
+    BootstrapSettings::export(&config)?;
     BoundaryProof::export(&config)?;
     BuildInfo::export(&config)?;
     CoreEvent::export(&config)?;
     CorrelationId::export(&config)?;
     Cursor::export(&config)?;
+    EffectiveModule::export(&config)?;
     EventEnvelope::<String>::export(&config)?;
     HealthReason::export(&config)?;
     HealthState::export(&config)?;
+    ListModulesResponse::export(&config)?;
+    ModuleCapability::export(&config)?;
     ModuleEnablement::export(&config)?;
     ModuleId::export(&config)?;
+    ModuleManifestView::export(&config)?;
     Page::<String>::export(&config)?;
     PageRequest::export(&config)?;
     RuntimeProfile::export(&config)?;
+    SetThemeRequest::export(&config)?;
     SettingsCategory::export(&config)?;
     SystemIdentity::export(&config)?;
+    TaskManagerBlockDeviceUsage::export(&config)?;
+    TaskManagerCpuCoreUsage::export(&config)?;
+    TaskManagerCpuUsage::export(&config)?;
+    TaskManagerLoadUsage::export(&config)?;
+    TaskManagerMemoryUsage::export(&config)?;
+    TaskManagerNetworkInterfaceUsage::export(&config)?;
+    TaskManagerPartialReason::export(&config)?;
+    TaskManagerPressureUsage::export(&config)?;
+    TaskManagerPressureWindow::export(&config)?;
+    TaskManagerProcessDetailField::export(&config)?;
+    TaskManagerProcessDetails::export(&config)?;
+    TaskManagerProcessIdentity::export(&config)?;
+    TaskManagerProcessIo::export(&config)?;
+    TaskManagerProcessMemoryDetails::export(&config)?;
+    TaskManagerProcessState::export(&config)?;
+    TaskManagerProcessSummary::export(&config)?;
+    TaskManagerSnapshot::export(&config)?;
+    TaskManagerSnapshotRequest::export(&config)?;
+    TaskManagerSort::export(&config)?;
+    TaskManagerSortDirection::export(&config)?;
+    ThemePreference::export(&config)?;
 
     fs::write(output.join("index.ts"), generated_index())?;
     Ok(())
@@ -168,21 +202,48 @@ fn generated_index() -> String {
         "AppErrorCode",
         "AppErrorDetails",
         "Availability",
+        "BootstrapSettings",
         "BoundaryProof",
         "BuildInfo",
         "CoreEvent",
         "CorrelationId",
         "Cursor",
+        "EffectiveModule",
         "EventEnvelope",
         "HealthReason",
         "HealthState",
+        "ListModulesResponse",
+        "ModuleCapability",
         "ModuleEnablement",
         "ModuleId",
+        "ModuleManifestView",
         "Page",
         "PageRequest",
         "RuntimeProfile",
+        "SetThemeRequest",
         "SettingsCategory",
         "SystemIdentity",
+        "TaskManagerBlockDeviceUsage",
+        "TaskManagerCpuCoreUsage",
+        "TaskManagerCpuUsage",
+        "TaskManagerLoadUsage",
+        "TaskManagerMemoryUsage",
+        "TaskManagerNetworkInterfaceUsage",
+        "TaskManagerPartialReason",
+        "TaskManagerPressureUsage",
+        "TaskManagerPressureWindow",
+        "TaskManagerProcessDetailField",
+        "TaskManagerProcessDetails",
+        "TaskManagerProcessIdentity",
+        "TaskManagerProcessIo",
+        "TaskManagerProcessMemoryDetails",
+        "TaskManagerProcessState",
+        "TaskManagerProcessSummary",
+        "TaskManagerSnapshot",
+        "TaskManagerSnapshotRequest",
+        "TaskManagerSort",
+        "TaskManagerSortDirection",
+        "ThemePreference",
     ];
     let exports = names
         .into_iter()

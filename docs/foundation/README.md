@@ -101,4 +101,4 @@ Reviewed on 2026-07-30 before implementation:
 
 ## Current implementation task
 
-`FND-BST-001` through `FND-BST-005`, `FND-SHL-001`, and `FND-SHL-001A` are complete. The next dependency-ready tasks include `FND-BST-006`, `FND-DAT-001`, and `FND-SHL-003`; no subsequent task is selected.
+`FND-BST-001` through `FND-BST-006`, `FND-DAT-001` through `FND-DAT-002`, and `FND-SHL-001` through `FND-SHL-004` are complete. They provide the build/lifecycle profile boundary, safe runtime/configuration path, persisted themes, shared states/dialog, and matching lazy backend/frontend registries needed by the first feature. No later foundation task is selected by this status update.

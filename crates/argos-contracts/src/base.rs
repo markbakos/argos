@@ -1,6 +1,6 @@
 use argos_domain::{
     ActionClassification as DomainActionClassification, ActorContext as DomainActorContext,
-    ActorKind as DomainActorKind, CorrelationId as DomainCorrelationId,
+    ActorKind as DomainActorKind, CorrelationId as DomainCorrelationId, ModuleId as DomainModuleId,
 };
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
@@ -37,6 +37,12 @@ impl ModuleId {
     #[must_use]
     pub fn as_str(&self) -> &str {
         &self.0
+    }
+}
+
+impl From<&DomainModuleId> for ModuleId {
+    fn from(value: &DomainModuleId) -> Self {
+        Self(value.as_str().to_owned())
     }
 }
 

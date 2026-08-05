@@ -1,6 +1,7 @@
 import { MonitorIcon } from "lucide-react";
 
 import { useSystemIdentity } from "./systemIdentity";
+import { useTheme } from "./theme";
 
 interface PageHeaderProps {
   eyebrow: string;
@@ -81,12 +82,54 @@ export function DashboardPage() {
 }
 
 export function SettingsPage() {
+  const theme = useTheme();
+
   return (
-    <PageHeader
-      eyebrow="Core"
-      title="Settings"
-      description="Application and module preferences will be configured here as their foundation tasks are completed."
-    />
+    <div className="max-w-3xl">
+      <PageHeader
+        eyebrow="Core"
+        title="Settings"
+        description="Choose how Argos looks on this machine."
+      />
+      <fieldset className="mt-8 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-5">
+        <legend className="px-1 font-semibold">Theme</legend>
+        <p className="mt-1 text-sm text-[var(--text-muted)]">
+          System follows your desktop color preference.
+        </p>
+        <div className="mt-4 grid gap-2 sm:grid-cols-3">
+          {(["system", "light", "dark"] as const).map((preference) => (
+            <label
+              key={preference}
+              className="flex min-h-11 cursor-pointer items-center gap-3 rounded-lg border border-[var(--border)] px-3 capitalize hover:bg-[var(--surface-hover)] focus-within:ring-2 focus-within:ring-[var(--focus-ring)]"
+            >
+              <input
+                type="radio"
+                name="theme"
+                value={preference}
+                checked={theme.preference === preference}
+                disabled={theme.isSaving}
+                onChange={() => void theme.setPreference(preference)}
+              />
+              {preference}
+            </label>
+          ))}
+        </div>
+        <p aria-live="polite" className="mt-3 text-sm text-[var(--text-muted)]">
+          {theme.isSaving
+            ? "Saving theme…"
+            : "Theme preference is saved locally."}
+        </p>
+        {theme.hasWarning ? (
+          <p
+            role="status"
+            className="mt-2 text-sm text-[var(--status-warning)]"
+          >
+            The saved theme was invalid, so Argos is using system. Choose a
+            theme to correct it.
+          </p>
+        ) : null}
+      </fieldset>
+    </div>
   );
 }
 

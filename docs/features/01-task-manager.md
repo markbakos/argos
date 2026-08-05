@@ -1,6 +1,7 @@
 # TM-01 — Task Manager
 
-**Status:** Approved for implementation on 2026-08-05  
+**Status:** Implemented through `TMG-004` on 2026-08-05; `TMG-005` target verification pending
+
 **Type:** Compiled read-only module  
 **Depends on:** FND-BST-004 contracts; FND-BST-006 capability/lifecycle; FND-SHL-002 shared UI patterns; FND-SHL-003/004 backend and frontend registries  
 **Persistence:** None
@@ -52,6 +53,7 @@ No metric is gathered at application startup or while another route is active.
 ### Sampling model and bounded cache
 
 - A snapshot is a point-in-time read. Rates come from monotonic counter deltas between two valid snapshots; the first sample and any sample after a gap greater than five seconds have no rate.
+- `TaskManagerSnapshotRequest.fresh_baseline` starts a new visible sampling session without reusing an earlier delta; initial and visibility-restored requests set it, while scheduled ticks do not.
 - Counter regression, reset, process identity change, zero elapsed time, or malformed input makes only that derived rate unavailable. Values are never allowed to underflow, overflow, become negative, or present stale rates as current.
 - Identify a process sample by `(pid, start_time_ticks)` so PID reuse cannot inherit an earlier process's CPU or I/O rate.
 - Retain at most one bounded previous raw snapshot in the Rust application service for delta calculation.
@@ -214,7 +216,7 @@ Tests must not depend on the developer's live process names, command lines, XDG 
 
 ## Implementation order and tasks
 
-The dependency-ordered `TMG-*` tasks live in [the feature task ledger](tasks.md). Approval selected `TMG-001` first; later tasks still require their listed dependencies.
+The dependency-ordered `TMG-*` tasks live in [the feature task ledger](tasks.md). `TMG-001` through `TMG-004` are complete. `TMG-005` retains the full-duration target performance, memory/write, interactive accessibility, and final evidence work.
 
 ## Source-interface rationale
 

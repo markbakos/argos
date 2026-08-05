@@ -4,7 +4,7 @@
 
 Feature tasks are stable, dependency-ordered implementation units. A task includes implementation, the expected-behavior tests it owns, documentation synchronization, and its completion condition.
 
-**Implementation status:** `TMG-001` selected and in progress; `TMG-002` through `TMG-005` pending. TM-01 was approved by the user on 2026-08-05. This ledger does not change or select work in the [foundation ledger](../foundation/tasks.md).
+**Implementation status:** `TMG-001` through `TMG-004` completed on 2026-08-05. `TMG-005` remains pending for its full-duration target performance/write/memory observation and interactive accessibility smoke. This ledger does not change or select work in the [foundation ledger](../foundation/tasks.md).
 
 ## TM-01 — Task Manager
 

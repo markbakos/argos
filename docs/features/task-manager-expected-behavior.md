@@ -4,7 +4,7 @@
 
 These Given/When/Then scenarios are the test-first oracle for [TM-01](01-task-manager.md). They refine its acceptance criteria without adding scope. If a scenario conflicts with TM-01 or a higher-authority document, update and approve the normative document before implementation.
 
-TM-01 was approved on 2026-08-05. Implementation still follows the selected dependency-ordered task in the feature ledger.
+TM-01 was approved on 2026-08-05. `TMG-001` through `TMG-004` are complete; `TMG-005` remains pending for full-duration target verification.
 
 ## TM-01-AC01 — Lazy module integration
 

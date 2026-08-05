@@ -17,8 +17,8 @@ The foundation ledger remains authoritative for foundation tasks. Feature tasks 
 
 | ID    | Specification                      | Status                       | Expected behavior                                    | Task ledger               |
 | ----- | ---------------------------------- | ---------------------------- | ---------------------------------------------------- | ------------------------- |
-| TM-01 | [Task Manager](01-task-manager.md) | Approved on 2026-08-05 | [TM-01 scenarios](task-manager-expected-behavior.md) | [Feature tasks](tasks.md) |
+| TM-01 | [Task Manager](01-task-manager.md) | Implemented; target verification pending | [TM-01 scenarios](task-manager-expected-behavior.md) | [Feature tasks](tasks.md) |
 
 ## Current feature task
 
-`TMG-001` is selected. Later `TMG-*` tasks remain pending until their dependencies pass.
+`TMG-001` through `TMG-004` are complete. `TMG-005` remains pending for the full ten-minute active/inactive CPU observation, 30-minute memory/write observation, and interactive target accessibility matrix; the optimized build, real GNOME launch/clean exit, 305-process snapshot smoke, and read-only static gates already pass.

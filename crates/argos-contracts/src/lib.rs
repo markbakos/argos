@@ -2,6 +2,8 @@
 
 mod base;
 mod error;
+mod modules;
+mod task_manager;
 
 pub use base::{
     ActionClassification, ActorId, ActorKind, ActorRef, Availability, BoundaryProof, BuildInfo,
@@ -9,3 +11,16 @@ pub use base::{
     ModuleId, Page, PageRequest, RuntimeProfile, SettingsCategory, SystemIdentity,
 };
 pub use error::{AppError, AppErrorCode, AppErrorDetails};
+pub use modules::{
+    BootstrapSettings, EffectiveModule, ListModulesResponse, ModuleCapability, ModuleManifestView,
+    SetThemeRequest, ThemePreference,
+};
+pub use task_manager::{
+    TaskManagerBlockDeviceUsage, TaskManagerCpuCoreUsage, TaskManagerCpuUsage,
+    TaskManagerLoadUsage, TaskManagerMemoryUsage, TaskManagerNetworkInterfaceUsage,
+    TaskManagerPartialReason, TaskManagerPressureUsage, TaskManagerPressureWindow,
+    TaskManagerProcessDetailField, TaskManagerProcessDetails, TaskManagerProcessIdentity,
+    TaskManagerProcessIo, TaskManagerProcessMemoryDetails, TaskManagerProcessState,
+    TaskManagerProcessSummary, TaskManagerSnapshot, TaskManagerSnapshotRequest, TaskManagerSort,
+    TaskManagerSortDirection,
+};
