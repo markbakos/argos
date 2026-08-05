@@ -2,6 +2,8 @@ import { SearchIcon } from "lucide-react";
 import { NavLink, Outlet } from "react-router-dom";
 
 import { CORE_ROUTES } from "./coreRoutes";
+import { useModules } from "./modules";
+import { getModuleRegistration } from "../modules/registry";
 
 function navigationClassName(isActive: boolean) {
   const base =
@@ -13,6 +15,10 @@ function navigationClassName(isActive: boolean) {
 }
 
 export function AppShell() {
+  const modules = useModules();
+  const dashboard = CORE_ROUTES.filter(({ path }) => path === "/");
+  const utilities = CORE_ROUTES.filter(({ path }) => path !== "/");
+
   return (
     <div className="grid min-h-dvh grid-cols-[15rem_minmax(0,1fr)] bg-[var(--background)] text-[var(--text)] max-[760px]:grid-cols-1 max-[760px]:grid-rows-[auto_1fr]">
       <a
@@ -51,11 +57,50 @@ export function AppShell() {
           aria-label="Primary navigation"
           className="mt-6 flex flex-1 flex-col gap-1 max-[760px]:mt-4 max-[760px]:flex-row max-[760px]:overflow-x-auto"
         >
-          {CORE_ROUTES.map(({ path, label, icon: Icon }) => (
+          {dashboard.map(({ path, label, icon: Icon }) => (
             <NavLink
               key={path}
               to={path}
               end={path === "/"}
+              className={({ isActive }) => navigationClassName(isActive)}
+            >
+              <Icon aria-hidden="true" className="size-[1.125rem] shrink-0" />
+              <span>{label}</span>
+            </NavLink>
+          ))}
+          {modules.data?.modules
+            .filter((module) => module.enablement === "enabled")
+            .map((module) => {
+              const registration = getModuleRegistration(module.manifest.id);
+              if (!registration) return null;
+              const Icon = registration.icon;
+              return (
+                <NavLink
+                  key={module.manifest.id}
+                  to={module.manifest.route}
+                  className={({ isActive }) => navigationClassName(isActive)}
+                >
+                  <Icon
+                    aria-hidden="true"
+                    className="size-[1.125rem] shrink-0"
+                  />
+                  <span>{module.manifest.display_name}</span>
+                  {module.health !== "available" ? (
+                    <span className="ml-auto text-[0.625rem] font-semibold tracking-wide uppercase">
+                      {module.health}
+                    </span>
+                  ) : null}
+                </NavLink>
+              );
+            })}
+          <div
+            aria-hidden="true"
+            className="my-2 border-t border-[var(--border)]"
+          />
+          {utilities.map(({ path, label, icon: Icon }) => (
+            <NavLink
+              key={path}
+              to={path}
               className={({ isActive }) => navigationClassName(isActive)}
             >
               <Icon aria-hidden="true" className="size-[1.125rem] shrink-0" />

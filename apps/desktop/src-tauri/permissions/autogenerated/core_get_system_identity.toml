@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-core-get-system-identity"
+description = "Enables the core_get_system_identity command without any pre-configured scope."
+commands.allow = ["core_get_system_identity"]
+
+[[permission]]
+identifier = "deny-core-get-system-identity"
+description = "Denies the core_get_system_identity command without any pre-configured scope."
+commands.deny = ["core_get_system_identity"]

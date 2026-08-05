@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 
 import type {
   BoundaryProof,
+  BuildInfo,
   EventEnvelope,
   SystemIdentity,
 } from "../generated";
@@ -36,6 +37,27 @@ function ProofConsumer({ transport }: { transport: Transport }) {
 }
 
 describe("core API", () => {
+  it("reports the embedded build profile through the typed core boundary", async () => {
+    const buildInfo: BuildInfo = {
+      version: "0.1.0",
+      build: "debug",
+      profile: "development",
+    };
+    const transport: Transport = {
+      invoke<T>(command: string, decode: (value: unknown) => T) {
+        expect(command).toBe("core_get_build_info");
+        return Promise.resolve(buildInfo).then(decode);
+      },
+      listen() {
+        return Promise.resolve(() => undefined);
+      },
+    };
+
+    await expect(createApi(transport).core.getBuildInfo()).resolves.toEqual(
+      buildInfo,
+    );
+  });
+
   it("reads and validates the machine hostname through one semantic method", async () => {
     const commands: string[] = [];
     const identity: SystemIdentity = { hostname: "argos-workstation" };

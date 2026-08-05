@@ -1,4 +1,10 @@
-import { cleanup, render, screen, within } from "@testing-library/react";
+import {
+  cleanup,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createMemoryRouter, type RouteObject } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -17,6 +23,33 @@ afterEach(() => {
 });
 
 function renderRoutes(routes: RouteObject[], initialPath = "/") {
+  vi.spyOn(api.core, "listModules").mockResolvedValue({
+    modules: [
+      {
+        manifest: {
+          id: "task-manager",
+          display_name: "Task Manager",
+          description: "Current local resource use.",
+          version: "1",
+          route: "/task-manager",
+          default_order: 100,
+          default_enabled: true,
+          capabilities: ["task_manager_read"],
+          dependencies: [],
+          linux_required: true,
+        },
+        enablement: "enabled",
+        order: 100,
+        health: "available",
+      },
+    ],
+    unknown_preference_ids: [],
+  });
+  vi.spyOn(api.core, "getSettings").mockResolvedValue({
+    theme: "system",
+    theme_warning: false,
+    production_data_warning: false,
+  });
   const queryClient = createAppQueryClient();
   const router = createMemoryRouter(routes, {
     initialEntries: [initialPath],
@@ -107,6 +140,30 @@ describe("application shell", () => {
     expect(identity).toHaveBeenCalledTimes(1);
   });
 
+  it("lazy-loads Task Manager and starts no feature read on other routes", async () => {
+    vi.spyOn(api.core, "getSystemIdentity").mockResolvedValue({
+      hostname: "argos-workstation",
+    });
+    const snapshot = vi
+      .spyOn(api.taskManager, "snapshot")
+      .mockReturnValue(new Promise<never>(() => undefined));
+    const { user } = renderRoutes(appRoutes);
+
+    expect(
+      await screen.findByRole("heading", {
+        level: 1,
+        name: "argos-workstation",
+      }),
+    ).toBeTruthy();
+    expect(snapshot).not.toHaveBeenCalled();
+
+    await user.click(await screen.findByRole("link", { name: "Task Manager" }));
+    expect(
+      await screen.findByRole("heading", { level: 1, name: "Task Manager" }),
+    ).toBeTruthy();
+    expect(snapshot).toHaveBeenCalledTimes(1);
+  });
+
   it("stays usable when hostname is unavailable without exposing the failure", async () => {
     const boundaryProof = vi
       .spyOn(api.core, "proveBoundary")
@@ -114,7 +171,7 @@ describe("application shell", () => {
     const identity = vi
       .spyOn(api.core, "getSystemIdentity")
       .mockRejectedValue(new Error("private hostname source failure"));
-    const { queryClient, user } = renderRoutes(appRoutes);
+    const { user } = renderRoutes(appRoutes);
 
     expect(await screen.findByText("Hostname unavailable")).toBeTruthy();
     expect(
@@ -131,7 +188,6 @@ describe("application shell", () => {
     expect(screen.getByText("Hostname unavailable")).toBeTruthy();
     expect(boundaryProof).not.toHaveBeenCalled();
     expect(identity).toHaveBeenCalledTimes(1);
-    expect(queryClient.getQueryCache().getAll()).toHaveLength(1);
   });
 
   it("preserves the Dashboard composition while hostname is loading", () => {
@@ -150,7 +206,7 @@ describe("application shell", () => {
 
   it("does not request hostname when another core route opens directly", async () => {
     const identity = vi.spyOn(api.core, "getSystemIdentity");
-    const { queryClient, user } = renderRoutes(appRoutes, "/settings");
+    const { user } = renderRoutes(appRoutes, "/settings");
 
     expect(
       screen.getByRole("heading", { level: 1, name: "Settings" }),
@@ -158,7 +214,22 @@ describe("application shell", () => {
     await user.click(screen.getByRole("link", { name: "Diagnostics" }));
 
     expect(identity).not.toHaveBeenCalled();
-    expect(queryClient.getQueryCache().getAll()).toHaveLength(0);
+  });
+
+  it("applies and persists a selected theme", async () => {
+    const setTheme = vi.spyOn(api.core, "setTheme").mockResolvedValue({
+      theme: "dark",
+      theme_warning: false,
+      production_data_warning: false,
+    });
+    const { user } = renderRoutes(appRoutes, "/settings");
+
+    await user.click(screen.getByRole("radio", { name: "dark" }));
+
+    expect(setTheme).toHaveBeenCalledWith({ theme: "dark" });
+    await waitFor(() => {
+      expect(document.documentElement.dataset["theme"]).toBe("dark");
+    });
   });
 
   it("keeps the shell available around loading route content", () => {

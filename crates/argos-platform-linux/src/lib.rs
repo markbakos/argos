@@ -1,6 +1,12 @@
 //! Linux path, configuration, filesystem, opener, and process adapters.
 
+mod configuration;
+mod task_manager;
+
 use argos_domain::{Hostname, HostnameError, SystemIdentityReader};
+
+pub use configuration::{LinuxConfigStore, PathEnvironment, ResolvedPaths, resolve_paths};
+pub use task_manager::LinuxTaskManagerReader;
 
 /// Safe adapter for the current Linux kernel hostname value.
 #[derive(Clone, Copy, Debug, Default)]

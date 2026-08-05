@@ -1,37 +1,44 @@
 @import "tailwindcss";
 
 :root {
-  color-scheme: light dark;
+  color-scheme: light;
   font-family: Inter, ui-sans-serif, system-ui, sans-serif;
   --background: #f5f5f4;
   --surface: #ffffff;
+  --surface-raised: #ffffff;
   --surface-hover: #f0efed;
   --sidebar: #fafaf9;
   --border: #deddd9;
   --text: #1c1917;
   --text-muted: #57534e;
   --accent: #2563eb;
+  --primary: #2563eb;
   --accent-contrast: #ffffff;
   --nav-active: #e7e5e4;
   --focus-ring: #2563eb;
   --status-warning: #b45309;
+  --danger: #b91c1c;
+  --success: #15803d;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #171717;
-    --surface: #242424;
-    --surface-hover: #2e2e2e;
-    --sidebar: #1c1c1c;
-    --border: #3f3f3f;
-    --text: #fafafa;
-    --text-muted: #b8b8b8;
-    --accent: #60a5fa;
-    --accent-contrast: #172033;
-    --nav-active: #343434;
-    --focus-ring: #93c5fd;
-    --status-warning: #fbbf24;
-  }
+[data-theme="dark"] {
+  color-scheme: dark;
+  --background: #171717;
+  --surface: #242424;
+  --surface-raised: #292929;
+  --surface-hover: #2e2e2e;
+  --sidebar: #1c1c1c;
+  --border: #3f3f3f;
+  --text: #fafafa;
+  --text-muted: #b8b8b8;
+  --accent: #60a5fa;
+  --primary: #60a5fa;
+  --accent-contrast: #172033;
+  --nav-active: #343434;
+  --focus-ring: #93c5fd;
+  --status-warning: #fbbf24;
+  --danger: #f87171;
+  --success: #4ade80;
 }
 
 * {
@@ -48,6 +55,11 @@ body,
 body {
   margin: 0;
   background: var(--background);
+}
+
+.task-manager-process-row {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 3.5rem;
 }
 
 button,

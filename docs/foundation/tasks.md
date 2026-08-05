@@ -6,7 +6,7 @@ Tasks are ordered by dependency and have stable IDs. A task includes implementat
 
 The [documentation phase gate](README.md#phase-gate) was approved by the user on 2026-07-30. Tasks are authorized only in the dependency order below.
 
-**Implementation status:** `FND-BST-001` through `FND-BST-005`, `FND-SHL-001`, and `FND-SHL-001A` complete; `FND-BST-006` and all other tasks remain pending.
+**Implementation status:** `FND-BST-001` through `FND-BST-006`, `FND-DAT-001` through `FND-DAT-002`, and `FND-SHL-001` through `FND-SHL-004` completed by 2026-08-05. Later storage, module-preference, systemd, launcher, diagnostics, and integrated-verification tasks remain pending.
 
 ## Stage 1 — Reproducible boundary
 

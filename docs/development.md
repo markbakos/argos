@@ -27,7 +27,7 @@ Validated on Arch Linux on 2026-07-30:
 - Node.js 24.15 or newer and pnpm 11.18.0, pinned by the root `packageManager` field; Node.js 24 LTS is the CI target and local bootstrap was checked with Node.js 26.5.0;
 - Arch packages `webkit2gtk-4.1`, `base-devel`, `corepack`, `curl`, `wget`, `file`, `openssl`, `nodejs`, `npm`, and `sqlite`;
 - Tauri 2.11, React 19, Vite 8, Tailwind CSS 4 through its first-party Vite plugin, and Lucide 1;
-- `rusqlite` with bundled SQLite for deterministic application storage, `zbus` with the Tokio backend for systemd D-Bus, `ts-rs` for Rust-owned TypeScript generation, `rustix` with only its `system` API for a safe kernel hostname read under the workspace's `unsafe_code = "forbid"` policy, and Lucide for the lightweight icon set.
+- `rusqlite` with bundled SQLite for deterministic application storage, `zbus` with the Tokio backend for systemd D-Bus, `ts-rs` for Rust-owned TypeScript generation, `rustix` with only its safe `system`, `param`, and `process` APIs for kernel identity/page size/ownership checks under the workspace's `unsafe_code = "forbid"` policy, `toml` for the versioned bootstrap configuration, and Lucide for the lightweight icon set.
 
 The clean-checkout bootstrap proof used `pnpm install --frozen-lockfile`, the desktop frontend build, and `cargo check --workspace --locked --offline`. The empty domain crate has no dependency, and Tauri appears only under `argos-desktop` in the Cargo graph. Generator, database, and D-Bus behavior remain owned by their later tasks.
 
@@ -60,7 +60,7 @@ The implemented core shell is contained under `apps/desktop/src/app/`:
 - `query.ts` defines a 30-second stale time, five-minute cache lifetime, disabled focus refetch, no mutation retry, and at most two retries only for typed `ApiError` values marked `retryable`;
 - `coreRoutes.tsx` is the single source for the non-disableable Dashboard, Settings, and Diagnostics route presentation used by both the router and sidebar;
 - `router.tsx` owns the route tree, and keeps `RouteErrorPage.tsx` inside the `AppShell.tsx` outlet so a page failure cannot replace navigation;
-- `pages.tsx` contains the lightweight core pages. Dashboard alone uses the route-local system-identity query; Settings and Diagnostics issue no backend request, subscribe to no event, and create no query when opened directly.
+- `pages.tsx` contains the lightweight core pages. Dashboard alone uses the route-local system-identity query; Settings reads the bootstrap theme configuration; Diagnostics issues no backend request.
 
 TanStack Query supplies an `AbortSignal` to query functions; route consumers must pass or observe it so unmounting cancels obsolete work. The shell test suite proves bounded retry behavior, cancellation on unmount, loading and failure containment, core navigation, one initial identity query on Dashboard, and zero queries when another core route opens directly.
 
@@ -72,7 +72,27 @@ The Tauri composition root injects that adapter and exposes `core_get_system_ide
 
 The page uses a single non-interactive identity composition: `Dashboard` label, hostname H1, and `Your local control center.` It contains no shortcuts, onboarding, user profile/greeting, metrics, or feature aggregation. Loading and failure preserve the layout as `This machine`; failure displays only `Hostname unavailable`. The hostname is not persisted, logged, audited, emitted, or exported by this flow.
 
-`styles/index.css` currently provides only the semantic surface, text, border, accent, focus, and warning tokens required to render the shell with system light/dark preference and reduced-motion-safe transitions. `FND-SHL-002` owns the complete persisted theme behavior and shared accessible primitive/state vocabulary.
+`styles/index.css` owns semantic light/dark surface, text, border, accent, focus, status, and reduced-motion tokens. `app/theme.tsx` applies the persisted system/light/dark preference and tracks live system color-scheme changes. Shared status and native-dialog primitives live under `components/`; the dialog opens modally, gives initial focus, handles Escape, and restores focus.
+
+### Runtime paths and bootstrap configuration
+
+Source builds resolve the `development` profile under the `argos-dev` XDG namespace. The explicit `pnpm package` build embeds `production`; development-to-production selection still requires both exact environment acknowledgements from the normative path specification. `ARGOS_HOME` is development-only, absolute, outside the repository, and separates `config`, `data`, `state`, `cache`, and `runtime`. Missing/invalid runtime paths remain unavailable rather than falling back into the repository or current directory.
+
+The lazily created private `config.toml` currently contains only:
+
+```toml
+version = 1
+theme = "system" # system, light, or dark
+executable_search_paths = []
+```
+
+Writes use an owner-only temporary file, file sync, atomic rename, and directory sync. Existing configuration files/directories must be owned by the current user and must not be symlinks; the configuration directory is mode `0700` and the file is mode `0600` where Unix permissions apply. Executable search paths must be distinct existing absolute directories. An unknown theme safely becomes `system`, exposes a correction warning, and is replaced on the next explicit theme choice. Other malformed/unsupported configuration fails closed without replacing the file.
+
+### Module registries and Task Manager
+
+`argos-application` owns the compiled manifest registry and deterministic enablement/order/health calculation. `apps/desktop/src/modules/registry.tsx` is the sole frontend presentation/lazy-route registry. The boundary gate compares their stable ID inventories so they cannot silently diverge. Dashboard remains first; enabled modules follow backend order; Settings and Diagnostics remain core routes.
+
+Task Manager is the first available module at `/task-manager`. Its Tauri capability grants only bounded snapshot and process-detail reads to the main window. The React module is lazy, starts with a fresh baseline only when visible, samples no more than once every two seconds without overlap, retains 30 aggregate display points, discards late/closed detail data, and removes all timers/data on hide or route teardown. Rust fixes the `/proc` and `/sys` sources, bounds each scan, retains one prior raw snapshot for rates, and performs no persistence, audit, logging, mutation, elevation, or background work.
 
 ## Command surface
 
@@ -84,6 +104,7 @@ The implemented root pnpm scripts delegate to workspace tools so contributors do
 | `pnpm dev`                                       | Run the Tauri development app with embedded `development` profile                                      |
 | `pnpm build`                                     | Type-check and build frontend plus Rust desktop artifacts without packaging                            |
 | `pnpm tauri:build`                               | Produce a local development-profile optimized desktop build                                            |
+| `pnpm package`                                   | Produce the explicit production-profile optimized desktop build without distribution bundling          |
 | `pnpm format` / `pnpm format:check`              | Apply/check Prettier and rustfmt                                                                       |
 | `pnpm lint`                                      | Run ESLint and Clippy with warnings denied                                                             |
 | `pnpm test`                                      | Run Rust and frontend automated tests with isolated roots                                              |
@@ -93,7 +114,7 @@ The implemented root pnpm scripts delegate to workspace tools so contributors do
 | `pnpm boundaries:check` / `pnpm boundaries:test` | Enforce and test Rust dependency and frontend Tauri-import boundaries                                  |
 | `pnpm check`                                     | Run formatting, lint, typecheck, tests, contract drift, boundaries, and frontend/Rust builds           |
 
-`pnpm package` remains reserved until `FND-BST-006` implements it. Migration and repository-live-data gates join `pnpm check` in their owning tasks. Commands fail with actionable prerequisite errors and do not access production data at runtime.
+Migration and repository-live-data gates join `pnpm check` in their owning tasks. Build commands fail with actionable prerequisite errors and do not open runtime data; running the resulting application resolves the embedded profile under the documented path rules.
 
 ## Quality gates
 

@@ -38,6 +38,9 @@ pub enum AppErrorCode {
     ProcessNotExecutable,
     ProcessOpenFailed,
     ProcessSpawnFailed,
+    TaskManagerUnavailable,
+    TaskManagerSnapshotFailed,
+    TaskManagerProcessGone,
     LauncherNotFound,
     LauncherConflict,
     LauncherKindUnsupported,
@@ -48,7 +51,7 @@ pub enum AppErrorCode {
 }
 
 impl AppErrorCode {
-    pub const ALL: [Self; 33] = [
+    pub const ALL: [Self; 36] = [
         Self::CoreInternal,
         Self::CoreCancelled,
         Self::ConfigHomeUnavailable,
@@ -75,6 +78,9 @@ impl AppErrorCode {
         Self::ProcessNotExecutable,
         Self::ProcessOpenFailed,
         Self::ProcessSpawnFailed,
+        Self::TaskManagerUnavailable,
+        Self::TaskManagerSnapshotFailed,
+        Self::TaskManagerProcessGone,
         Self::LauncherNotFound,
         Self::LauncherConflict,
         Self::LauncherKindUnsupported,
@@ -114,6 +120,9 @@ impl From<DomainErrorCode> for AppErrorCode {
             DomainErrorCode::ProcessNotExecutable => Self::ProcessNotExecutable,
             DomainErrorCode::ProcessOpenFailed => Self::ProcessOpenFailed,
             DomainErrorCode::ProcessSpawnFailed => Self::ProcessSpawnFailed,
+            DomainErrorCode::TaskManagerUnavailable => Self::TaskManagerUnavailable,
+            DomainErrorCode::TaskManagerSnapshotFailed => Self::TaskManagerSnapshotFailed,
+            DomainErrorCode::TaskManagerProcessGone => Self::TaskManagerProcessGone,
             DomainErrorCode::LauncherNotFound => Self::LauncherNotFound,
             DomainErrorCode::LauncherConflict => Self::LauncherConflict,
             DomainErrorCode::LauncherKindUnsupported => Self::LauncherKindUnsupported,

@@ -10,6 +10,7 @@
     "dev": "pnpm --filter @argos/desktop tauri dev",
     "build": "pnpm --filter @argos/desktop build && cargo build --workspace --locked",
     "tauri:build": "pnpm --filter @argos/desktop tauri build --no-bundle",
+    "package": "env ARGOS_PACKAGE_PROFILE=production pnpm --filter @argos/desktop tauri build --no-bundle",
     "format": "pnpm --filter @argos/desktop format && cargo fmt --all",
     "format:check": "pnpm --filter @argos/desktop format:check && cargo fmt --all --check",
     "lint": "pnpm --filter @argos/desktop lint && cargo clippy --workspace --all-targets --all-features --locked -- -D warnings",

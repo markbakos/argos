@@ -77,14 +77,15 @@ SQLite `-wal` and `-shm` sidecars live beside the database and are live data. Th
 
 `config.toml` contains only small application-level preferences:
 
-- theme preference: `system` (default), `light`, or `dark`;
-- optional explicit executable search paths;
+- `version = 1` for the current bootstrap schema;
+- `theme = "system"` (default), `"light"`, or `"dark"`;
+- `executable_search_paths = []` for optional explicit directories;
 - small startup/window behavior preferences added through a migration-like config version;
 - visibly named development overrides that do not weaken profile checks.
 
 User-created launcher/module/task records, audit events, imported content, and large settings do not belong in this file. Writes use an atomic temporary-file, sync/replace policy in the same config directory and preserve a last-known valid file on validation failure. Invalid configuration yields structured diagnostics and safe defaults only for non-security-sensitive preferences; unsafe paths fail closed.
 
-Executable search paths are absolute directories, ordered, de-duplicated, and validated. Defaults may be derived from a documented desktop environment policy at bootstrap, but the current directory is never searched. React cannot add a one-off path during launch.
+Executable search paths are absolute existing directories, ordered, de-duplicated, and validated. Defaults may be derived from a documented desktop environment policy at bootstrap, but the current directory is never searched. React cannot add a one-off path during launch. An unknown theme becomes `system` with a safe correction warning; choosing a valid theme rewrites the configuration atomically. Invalid paths and malformed/unsupported configuration fail closed without partial replacement.
 
 ## SQLite lifecycle
 

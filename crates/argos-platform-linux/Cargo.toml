@@ -9,6 +9,8 @@ license.workspace = true
 argos-application.workspace = true
 argos-domain.workspace = true
 rustix.workspace = true
+serde.workspace = true
+toml.workspace = true
 
 [lints]
 workspace = true

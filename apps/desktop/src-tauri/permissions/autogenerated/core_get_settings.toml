@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-core-get-settings"
+description = "Enables the core_get_settings command without any pre-configured scope."
+commands.allow = ["core_get_settings"]
+
+[[permission]]
+identifier = "deny-core-get-settings"
+description = "Denies the core_get_settings command without any pre-configured scope."
+commands.deny = ["core_get_settings"]

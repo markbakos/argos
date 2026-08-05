@@ -1,0 +1,13 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "core-read",
+  "description": "Read-only Argos core information for the local main window.",
+  "windows": ["main"],
+  "permissions": [
+    "allow-core-boundary-proof",
+    "allow-core-get-build-info",
+    "allow-core-get-settings",
+    "allow-core-get-system-identity",
+    "allow-core-list-modules"
+  ]
+}

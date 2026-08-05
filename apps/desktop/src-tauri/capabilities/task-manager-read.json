@@ -1,0 +1,10 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "task-manager-read",
+  "description": "Read-only access to bounded Task Manager snapshots and process details.",
+  "windows": ["main"],
+  "permissions": [
+    "allow-task-manager-snapshot",
+    "allow-task-manager-process-details"
+  ]
+}
